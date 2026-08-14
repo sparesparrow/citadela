@@ -1,0 +1,346 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  // Pro produkci zmente na "postgresql" a vymente driver adapter
+  // v src/lib/prisma.ts za @prisma/adapter-pg.
+  // Prisma 7: pripojovaci retezec zije v prisma.config.ts, ne tady.
+  provider = "sqlite"
+}
+
+enum Role {
+  GUEST
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(GUEST)
+  createdAt     DateTime  @default(now())
+
+  accounts  Account[]
+  sessions  Session[]
+  inquiries Inquiry[]
+  stays     Stay[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  CONFIRMED
+  DECLINED
+}
+
+model Inquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  arrival   DateTime
+  departure DateTime
+  guests    Int           @default(2)
+  roomSlug  String
+  message   String?
+  locale    String        @default("cs")
+  status    InquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  stay Stay?
+
+  @@index([status, createdAt])
+}
+
+/// Obsazenost stazena z Booking.com iCal exportu.
+model BlockedDate {
+  id       String   @id @default(cuid())
+  roomSlug String
+  date     DateTime
+  source   String   @default("booking.com")
+  uid      String?
+  summary  String?
+
+  @@unique([roomSlug, date, source])
+  @@index([roomSlug, date])
+}
+
+/// Zaznam o kazdem behu synchronizace kalendaru.
+model SyncLog {
+  id        String   @id @default(cuid())
+  startedAt DateTime @default(now())
+  ok        Boolean  @default(false)
+  imported  Int      @default(0)
+  message   String?
+}
+
+// ---------------------------------------------------------------------------
+// Pobyt — skutecny host v dome. Poptavka (Inquiry) je jen zajemce; teprve
+// Stay je potvrzeny pobyt, na ktery se vesi pristupova prava a utrata.
+// ---------------------------------------------------------------------------
+
+enum StayStatus {
+  BOOKED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+}
+
+model Stay {
+  id        String     @id @default(cuid())
+  reference String     @unique
+  arrival   DateTime
+  departure DateTime
+  status    StayStatus @default(BOOKED)
+  guests    Int        @default(2)
+  note      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  /// Z ktere poptavky pobyt vznikl (nepovinne — pobyt muze prijit z Booking.com).
+  inquiryId String?  @unique
+  inquiry   Inquiry? @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+
+  /// Ucet hlavniho objednatele, pokud je prihlaseny.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  stayGuests StayGuest[]
+  folioItems FolioItem[]
+
+  @@index([status, arrival])
+}
+
+/// Konkretni osoba na pobytu. Neni to nutne User — vetsina hostu ucet nema.
+model StayGuest {
+  id        String   @id @default(cuid())
+  stayId    String
+  stay      Stay     @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  /// Slug loznice ze src/lib/site.ts (BedroomSlug). Prazdne = bez prideleneho pokoje.
+  bedroomSlug String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  credentials    Credential[]
+  rentalSessions RentalSession[]
+
+  @@index([stayId])
+}
+
+// ---------------------------------------------------------------------------
+// Pristupove prostredky
+// ---------------------------------------------------------------------------
+
+enum CredentialType {
+  CARD
+  PHONE
+}
+
+enum CredentialStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
+/// Karta nebo instalace telefonu. UID karty NENI tajemstvi — autorizace
+/// vzdy probiha vyzva-odpoved, tady drzime jen otisk verejne casti.
+model Credential {
+  id        String           @id @default(cuid())
+  publicId  String           @unique
+  type      CredentialType
+  status    CredentialStatus @default(ACTIVE)
+  /// CARD: HMAC otisk diverzifikovaneho klice. PHONE: verejny klic z Android Keystore.
+  secretHash String
+  label     String?
+  validFrom DateTime
+  validTo   DateTime
+  createdAt DateTime         @default(now())
+  revokedAt DateTime?
+
+  stayGuestId String
+  stayGuest   StayGuest @relation(fields: [stayGuestId], references: [id], onDelete: Cascade)
+
+  accessEvents AccessEvent[]
+
+  @@index([stayGuestId])
+  @@index([status, validTo])
+}
+
+enum AccessPointKind {
+  DOOR
+  SCOOTER_DOCK
+}
+
+/// Fyzicka ctecka. Kazda ma vlastni klic, kterym podepisuje pozadavky.
+model AccessPoint {
+  id          String          @id
+  kind        AccessPointKind
+  label       String
+  /// U dveri loznice odpovidajici slug. Prazdne = spolecny prostor.
+  bedroomSlug String?
+  /// Spolecny prostor je pristupny vsem aktivnim hostum.
+  isCommon    Boolean         @default(false)
+  /// Ed25519 verejny klic ctecky (SPKI/DER, hex). Privatni cast zustava
+  /// v zarizeni — v databazi zamerne neni zadne tajemstvi.
+  devicePublicKey String
+  enabled     Boolean         @default(true)
+  lastSeenAt  DateTime?
+  createdAt   DateTime        @default(now())
+
+  scooters     Scooter[]
+  accessEvents AccessEvent[]
+
+  @@index([kind, enabled])
+}
+
+/// Nonce uz jednou pouzity ctečkou. Brani prehrani zachyceneho pozadavku.
+model UsedNonce {
+  nonce     String   @id
+  deviceId  String
+  seenAt    DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+/// Append-only audit. Kazdy priloziny tap, povoleny i zamitnuty.
+/// POZOR: jde o pohyb osoby po budove — osobni udaj. Viz retencni davka.
+model AccessEvent {
+  id        String   @id @default(cuid())
+  at        DateTime @default(now())
+  allowed   Boolean
+  /// Vyctovy duvod zamitnuti, napr. "credential_revoked", "wrong_room".
+  reason    String
+
+  accessPointId String
+  accessPoint   AccessPoint @relation(fields: [accessPointId], references: [id], onDelete: Cascade)
+
+  credentialId String?
+  credential   Credential? @relation(fields: [credentialId], references: [id], onDelete: SetNull)
+
+  @@index([at])
+  @@index([accessPointId, at])
+}
+
+// ---------------------------------------------------------------------------
+// Kolobezky
+// ---------------------------------------------------------------------------
+
+enum ScooterStatus {
+  AVAILABLE
+  RENTED
+  CHARGING
+  MAINTENANCE
+}
+
+model Scooter {
+  id         String        @id @default(cuid())
+  code       String        @unique
+  status     ScooterStatus @default(AVAILABLE)
+  batteryPct Int           @default(100)
+
+  dockId String?
+  dock   AccessPoint? @relation(fields: [dockId], references: [id], onDelete: SetNull)
+
+  /// Cenik: nastupni sazba a sazba za minutu, v halerich kvuli presnosti.
+  baseFeeCents    Int @default(0)
+  perMinuteCents  Int @default(300)
+
+  sessions RentalSession[]
+
+  @@index([status])
+}
+
+enum RentalStatus {
+  OPEN
+  CLOSED
+  ABANDONED
+}
+
+model RentalSession {
+  id        String       @id @default(cuid())
+  startedAt DateTime     @default(now())
+  endedAt   DateTime?
+  status    RentalStatus @default(OPEN)
+  /// Souhlas s podminkami pujcovny, zaznamenany pri startu.
+  termsVersion String
+
+  scooterId String
+  scooter   Scooter @relation(fields: [scooterId], references: [id], onDelete: Restrict)
+
+  stayGuestId String
+  stayGuest   StayGuest @relation(fields: [stayGuestId], references: [id], onDelete: Restrict)
+
+  folioItem FolioItem?
+
+  @@index([status])
+  @@index([stayGuestId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Uctenka pobytu
+// ---------------------------------------------------------------------------
+
+enum FolioItemKind {
+  SCOOTER_RENTAL
+  MANUAL
+}
+
+model FolioItem {
+  id          String        @id @default(cuid())
+  stayId      String
+  stay        Stay          @relation(fields: [stayId], references: [id], onDelete: Cascade)
+  kind        FolioItemKind
+  description String
+  /// V halerich (CZK * 100) — nikdy v pohyblive radove carce.
+  amountCents Int
+  createdAt   DateTime      @default(now())
+
+  rentalSessionId String?        @unique
+  rentalSession   RentalSession? @relation(fields: [rentalSessionId], references: [id], onDelete: SetNull)
+
+  @@index([stayId])
+}

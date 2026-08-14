@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Citadela Resort — Private Villa with Wellness · Brněnská přehrada, Rozdrojovice</title>
+<meta name="description" content="An entire villa for up to 40 guests above the Brno reservoir: eight bedrooms, a year-round heated pool, Finnish and infrared sauna, whirlpool and a fenced garden. Taken by one party at a time."/>
+<link rel="alternate" hreflang="cs" href="citadela-nahled-cs.html"/>
+<link rel="alternate" hreflang="en" href="citadela-nahled-en.html"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   CITADELA — design systém
+   Matná čerň a bohaté zlato. Art-deco geometrie, žádné dekorativní obrázky.
+   ========================================================================== */
+
+:root {
+  --black: #0a0a0a;
+  --ink: #0c0b08;
+  --gold: #c9a84c;
+  --gold-hi: #e7ce84;
+  --gold-lo: #9a7e32;
+  --cream: #f3ecdd;
+  --cream-dim: #cfc6b2;
+
+  --serif: var(--font-serif), "Playfair Display", Georgia, serif;
+  --logo: var(--font-logo), "Italiana", Georgia, serif;
+  --sans: var(--font-sans), "Jost", system-ui, -apple-system, sans-serif;
+
+  --line: rgba(201, 168, 76, 0.18);
+  --line-strong: rgba(201, 168, 76, 0.35);
+  --pad-x: 6vw;
+  --header-h: 84px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Aby sticky navigace nezakrývala cíl odkazu. */
+  scroll-padding-top: calc(var(--header-h) + 56px);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--black);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--gold); color: var(--black); }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: linear-gradient(var(--gold-hi), var(--gold-lo)); }
+
+/* Viditelný focus všude — nikdy neodstraňujeme obrys bez náhrady. */
+:focus-visible {
+  outline: 2px solid var(--gold-hi);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+img, svg { display: block; max-width: 100%; }
+
+/* Plynulé přechody mezi jazykovými verzemi (různé dokumenty). */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+
+/* --------------------------------------------------------------------------
+   Přístupnost — pomocné třídy
+   -------------------------------------------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  clip-path: inset(50%);
+  overflow: hidden;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0; left: 50%;
+  translate: -50% -120%;
+  z-index: 200;
+  background: var(--gold);
+  color: var(--black);
+  padding: 12px 24px;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: translate 0.25s var(--ease);
+}
+.skip-link:focus { translate: -50% 0; }
+
+/* --------------------------------------------------------------------------
+   Atmosféra
+   -------------------------------------------------------------------------- */
+.pattern-bg, .grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.pattern-bg {
+  z-index: 0;
+  opacity: 0.05;
+  background-image: var(--pattern-url);
+  background-size: 150px;
+}
+.grain {
+  z-index: 1;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: var(--grain-url);
+}
+
+/* --------------------------------------------------------------------------
+   Hlavička
+   -------------------------------------------------------------------------- */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  padding: 26px var(--pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid transparent;
+  transition: padding 0.4s ease, background 0.4s ease, border-color 0.4s ease;
+}
+.header[data-scrolled="true"] {
+  padding: 14px var(--pad-x);
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom-color: var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.brand svg { width: 46px; height: 46px; transition: width 0.4s, height 0.4s; }
+.header[data-scrolled="true"] .brand svg { width: 38px; height: 38px; }
+.brand-wm {
+  font-family: var(--logo);
+  font-size: 26px;
+  letter-spacing: 0.34em;
+  color: var(--cream);
+  padding-left: 0.34em;
+  white-space: nowrap;
+}
+
+.header-right { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); }
+
+.nav { display: flex; gap: clamp(20px, 2.6vw, 40px); }
+.nav a {
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  text-decoration: none;
+  position: relative;
+  padding: 8px 0;
+  transition: color 0.35s;
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 1px; width: 0;
+  background: linear-gradient(90deg, var(--gold-hi), var(--gold-lo));
+  transition: width 0.4s var(--ease);
+}
+.nav a:hover, .nav a[aria-current="true"] { color: var(--gold-hi); }
+.nav a:hover::after, .nav a[aria-current="true"]::after { width: 100%; }
+
+/* Přepínač jazyka */
+.lang {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+}
+.lang a {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--cream-dim);
+  padding: 9px 13px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.35s, color 0.35s;
+}
+.lang a[aria-current="true"] { background: var(--gold); color: var(--black); font-weight: 500; }
+.lang a:not([aria-current="true"]):hover { color: var(--gold-hi); background: rgba(201, 168, 76, 0.08); }
+
+.icon-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--gold-hi);
+  width: 48px; height: 48px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Tlačítka
+   -------------------------------------------------------------------------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  padding: 17px 38px;
+  min-height: 52px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--gold-lo);
+  color: var(--gold-hi);
+  background: transparent;
+  overflow: hidden;
+  transition: color 0.4s, border-color 0.4s;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  translate: -101% 0;
+  background: linear-gradient(90deg, var(--gold-lo), var(--gold) 50%, var(--gold-hi));
+  transition: translate 0.55s var(--ease);
+}
+.btn > span { position: relative; z-index: 1; }
+.btn:hover, .btn:focus-visible { color: var(--black); border-color: var(--gold-hi); }
+.btn:hover::before, .btn:focus-visible::before { translate: 0 0; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:disabled::before { translate: -101% 0; }
+
+.btn-solid { border-color: var(--gold); color: var(--black); }
+.btn-solid::before { translate: 0 0; background: linear-gradient(90deg, var(--gold-hi), var(--gold-lo)); }
+.btn-solid:hover::before, .btn-solid:focus-visible::before { filter: brightness(1.12); translate: 0 0; }
+.btn-block { width: 100%; }
+
+/* --------------------------------------------------------------------------
+   Sekce
+   -------------------------------------------------------------------------- */
+.section {
+  position: relative;
+  z-index: 2;
+  padding: clamp(80px, 11vh, 150px) var(--pad-x);
+  max-width: 1320px;
+  margin-inline: auto;
+  /* Odložení renderu mimo obrazovku — méně práce při prvním vykreslení. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+.section-tight { padding-block: 0; }
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.eyebrow::before { content: ""; width: 42px; height: 1px; background: var(--gold-lo); flex: none; }
+.eyebrow-center { justify-content: center; }
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; }
+h2 { font-size: clamp(30px, 4.6vw, 56px); color: var(--cream); max-width: 18ch; }
+.h2-center { margin-inline: auto; text-align: center; }
+.lead {
+  margin-top: 24px;
+  max-width: 54ch;
+  color: var(--cream-dim);
+  font-size: clamp(15px, 1.8vw, 18px);
+}
+.lead-center { margin-inline: auto; text-align: center; }
+
+.divider-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin: 30px auto 0;
+  color: var(--gold-lo);
+}
+.divider-dot::before, .divider-dot::after {
+  content: "";
+  height: 1px; width: 54px;
+  background: linear-gradient(90deg, transparent, var(--gold-lo));
+}
+.divider-dot::after { background: linear-gradient(90deg, var(--gold-lo), transparent); }
+.divider-dot span { width: 6px; height: 6px; background: var(--gold); rotate: 45deg; }
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  overflow: hidden;
+  padding-top: var(--header-h);
+}
+.hero-scene { position: absolute; inset: 0; z-index: -1; }
+.hero-scene svg, .hero-scene img { width: 100%; height: 100%; object-fit: cover; }
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse at 50% 70%, transparent 30%, rgba(10, 10, 10, 0.55) 75%, var(--black) 100%);
+}
+.hero-inner { position: relative; z-index: 2; padding-inline: var(--pad-x); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-inner { animation: rise 1.4s 0.2s var(--ease) backwards; }
+}
+@keyframes rise { from { opacity: 0; translate: 0 24px; } }
+
+.hero-mark { width: 118px; height: 118px; margin: 0 auto 26px; filter: drop-shadow(0 4px 24px rgba(201, 168, 76, 0.25)); }
+.logotype {
+  font-family: var(--logo);
+  font-size: clamp(58px, 12vw, 150px);
+  line-height: 0.92;
+  letter-spacing: 0.14em;
+  padding-left: 0.14em;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, var(--gold-lo));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.hero-place {
+  font-size: clamp(10px, 1.4vw, 13px);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.hero h1 {
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(22px, 3.4vw, 38px);
+  color: var(--cream);
+  margin: 34px auto 0;
+  max-width: 16ch;
+  line-height: 1.25;
+}
+.hero-sub { max-width: 54ch; margin: 22px auto 0; color: var(--cream-dim); font-size: clamp(14px, 1.7vw, 17px); }
+.cta-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 42px; }
+
+/* --------------------------------------------------------------------------
+   Sticky sekční navigace
+   -------------------------------------------------------------------------- */
+.subnav {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 40;
+  background: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(12px);
+  border-block: 1px solid var(--line);
+}
+.subnav-inner {
+  display: flex;
+  gap: 0;
+  max-width: 1320px;
+  margin-inline: auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.subnav-inner::-webkit-scrollbar { display: none; }
+.subnav a {
+  flex: 1 0 auto;
+  text-align: center;
+  padding: 16px 22px;
+  min-height: 52px;
+  font-size: 11.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  text-decoration: none;
+  border-right: 1px solid var(--line);
+  transition: background 0.35s, color 0.35s;
+}
+.subnav a:last-child { border-right: 0; }
+.subnav a:hover { color: var(--gold-hi); background: rgba(201, 168, 76, 0.06); }
+
+/* --------------------------------------------------------------------------
+   Odznaky vybavení
+   -------------------------------------------------------------------------- */
+.badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 22px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  transition: background 0.45s, color 0.45s;
+}
+.badge:hover { background: rgba(201, 168, 76, 0.06); color: var(--cream); }
+.badge svg { width: 26px; height: 26px; flex: none; color: var(--gold); }
+
+/* --------------------------------------------------------------------------
+   Hodnoty
+   -------------------------------------------------------------------------- */
+.values { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); margin-top: 46px; }
+.value {
+  padding: 48px 36px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.5s;
+}
+.value:nth-child(3n) { border-right: none; }
+.value::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  height: 2px; width: 0;
+  background: linear-gradient(90deg, var(--gold-hi), var(--gold-lo));
+  transition: width 0.6s ease;
+}
+.value:hover { background: linear-gradient(180deg, rgba(201, 168, 76, 0.06), transparent); }
+.value:hover::after { width: 100%; }
+.value-num { font-family: var(--serif); font-style: italic; color: var(--gold-lo); font-size: 20px; }
+.value h3 { font-style: italic; font-size: 24px; color: var(--gold-hi); margin: 14px 0 16px; }
+.value p { color: var(--cream-dim); font-size: 15.5px; }
+
+/* --------------------------------------------------------------------------
+   Střídavé řádky
+   -------------------------------------------------------------------------- */
+.feature {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 90px);
+  align-items: center;
+  padding-block: clamp(64px, 9vh, 116px);
+  border-top: 1px solid var(--line);
+}
+.feature-flip .feature-copy { order: 2; }
+.feature-flip .plate { order: 1; }
+
+.plate {
+  position: relative;
+  aspect-ratio: 7 / 5;
+  border: 1px solid var(--line-strong);
+  overflow: hidden;
+  background: var(--ink);
+}
+.plate > svg, .plate > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.plate::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.7); pointer-events: none; }
+.corner { position: absolute; width: 18px; height: 18px; border: 1px solid var(--gold); z-index: 3; }
+.corner-tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.corner-tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+.corner-bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+.corner-br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+.tags { list-style: none; margin-top: 30px; display: flex; flex-wrap: wrap; gap: 10px; }
+.tags li {
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  padding: 8px 15px;
+}
+
+/* --------------------------------------------------------------------------
+   Karty pokojů
+   -------------------------------------------------------------------------- */
+.rooms { display: grid; gap: 28px; margin-top: 48px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.room {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.04), transparent);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.45s, translate 0.45s var(--ease);
+}
+.room:hover { border-color: var(--gold); translate: 0 -4px; }
+.room-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--ink); border-bottom: 1px solid var(--line); }
+.room-media > svg, .room-media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.room-body { padding: 28px 26px 30px; display: flex; flex-direction: column; flex: 1; }
+.room h3 { font-style: italic; font-size: 25px; color: var(--gold-hi); }
+.room-facts { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-lo); }
+.room p { color: var(--cream-dim); font-size: 15px; margin-top: 16px; flex: 1; }
+.room-amenities { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.room-amenities li { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-dim); border: 1px solid var(--line); padding: 6px 11px; }
+.room-price { margin-top: 24px; display: flex; align-items: baseline; gap: 8px; font-family: var(--serif); }
+.room-price .from { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold-lo); font-family: var(--sans); }
+.room-price .amount { font-size: 30px; color: var(--cream); }
+.room-price .unit { font-size: 13px; color: var(--cream-dim); font-family: var(--sans); }
+.room-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.room-actions .btn { flex: 1 1 auto; padding-inline: 22px; font-size: 11px; }
+
+/* --------------------------------------------------------------------------
+   Vybavení — plný seznam
+   -------------------------------------------------------------------------- */
+.facilities { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 2px 32px; margin-top: 44px; list-style: none; }
+.facilities li { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; color: var(--cream-dim); }
+.facilities svg { width: 18px; height: 18px; flex: none; color: var(--gold); }
+
+/* --------------------------------------------------------------------------
+   Recenze
+   -------------------------------------------------------------------------- */
+.score {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 36px;
+  padding: 26px 30px;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(120deg, rgba(201, 168, 76, 0.09), transparent 70%);
+  max-width: 560px;
+}
+.score-badge {
+  font-family: var(--serif);
+  font-size: 36px;
+  color: var(--black);
+  background: linear-gradient(160deg, var(--gold-hi), var(--gold-lo));
+  width: 82px; height: 82px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.score-label { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.score-count { color: var(--cream-dim); font-size: 14px; margin-top: 4px; }
+.score a { color: var(--gold-hi); font-size: 13px; }
+
+.review-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(290px, 34%);
+  gap: 22px;
+  margin-top: 40px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 18px;
+  scrollbar-width: thin;
+}
+.review {
+  scroll-snap-align: start;
+  border: 1px solid var(--line);
+  padding: 28px 26px;
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent);
+  display: flex;
+  flex-direction: column;
+}
+.review-quote { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--cream); flex: 1; }
+.review-meta { margin-top: 20px; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-lo); }
+.review-stars { color: var(--gold); letter-spacing: 0.2em; margin-bottom: 14px; }
+
+/* --------------------------------------------------------------------------
+   Poloha
+   -------------------------------------------------------------------------- */
+.location-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(36px, 5vw, 70px); align-items: center; margin-top: 40px; }
+.map-frame { position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--line-strong); overflow: hidden; background: var(--ink); }
+.map-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(1) invert(0.9) contrast(1.1) sepia(0.35) saturate(1.6); }
+.distances { list-style: none; margin-top: 30px; }
+.distances li { display: flex; justify-content: space-between; gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+.distances span:first-child { color: var(--cream-dim); }
+.distances span:last-child { color: var(--gold-hi); font-family: var(--serif); }
+
+/* --------------------------------------------------------------------------
+   Rezervace
+   -------------------------------------------------------------------------- */
+.reserve-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 4vw, 56px); margin-top: 48px; align-items: start; }
+.reserve-card { border: 1px solid var(--line-strong); padding: clamp(28px, 4vw, 46px); background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent); }
+.reserve-card h3 { font-style: italic; font-size: 22px; color: var(--gold-hi); margin-bottom: 8px; }
+.reserve-note { color: var(--cream-dim); font-size: 14px; margin-top: 14px; }
+
+fieldset { border: 0; }
+legend { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+
+.field { margin-block-end: 22px; }
+.field label {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 9px;
+}
+.field .optional { color: var(--gold-lo); letter-spacing: 0.1em; text-transform: none; font-size: 10.5px; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--gold-lo);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 1rem;
+  padding: 12px 2px;
+  min-height: 48px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.field textarea { min-height: 92px; resize: vertical; line-height: 1.6; }
+.field input::placeholder, .field textarea::placeholder { color: #807a6b; /* 4.63:1 na černé — WCAG AA */ }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+  border-bottom-color: var(--gold-hi);
+  outline: 2px solid var(--gold-hi);
+  outline-offset: 4px;
+}
+.field select option { background: var(--ink); color: var(--cream); }
+/* Chyby hlásíme až když uživatel opustí pole, ne během psaní. */
+.field input:user-invalid, .field textarea:user-invalid { border-bottom-color: #e0705f; }
+.field-error { display: block; margin-top: 7px; font-size: 12.5px; color: #e8907f; letter-spacing: 0.04em; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.form-status { margin-top: 18px; padding: 15px 18px; border: 1px solid var(--line-strong); font-size: 14.5px; }
+.form-status[data-tone="ok"] { border-color: var(--gold); color: var(--gold-hi); background: rgba(201, 168, 76, 0.08); }
+.form-status[data-tone="error"] { border-color: #a8503f; color: #e8907f; background: rgba(168, 80, 63, 0.08); }
+.reassure { margin-top: 20px; font-family: var(--serif); font-style: italic; color: var(--cream-dim); font-size: 15px; }
+
+@media (pointer: coarse) {
+  .field input, .field select, .field textarea { min-height: 52px; }
+}
+
+/* --------------------------------------------------------------------------
+   Autentizace
+   -------------------------------------------------------------------------- */
+.auth-shell { min-height: 100svh; display: grid; place-items: center; padding: calc(var(--header-h) + 40px) var(--pad-x) 60px; position: relative; z-index: 2; }
+.auth-card { width: 100%; max-width: 460px; border: 1px solid var(--line-strong); padding: clamp(30px, 5vw, 52px); background: linear-gradient(180deg, rgba(201, 168, 76, 0.06), transparent); }
+.auth-card h1 { font-size: clamp(28px, 4vw, 40px); color: var(--cream); }
+.auth-lead { color: var(--cream-dim); margin-top: 14px; font-size: 15px; }
+.auth-divider { display: flex; align-items: center; gap: 16px; margin: 30px 0; color: var(--gold-lo); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; }
+.auth-divider::before, .auth-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; }
+.btn-google svg { width: 20px; height: 20px; }
+.auth-note { margin-top: 26px; padding: 16px 18px; border-left: 2px solid var(--gold-lo); color: var(--cream-dim); font-size: 13.5px; line-height: 1.65; }
+.pw-wrap { position: relative; }
+.pw-toggle {
+  position: absolute;
+  right: 0; bottom: 6px;
+  background: transparent;
+  border: 0;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 10px 4px;
+  min-height: 44px;
+}
+.auth-back { display: inline-block; margin-top: 28px; color: var(--cream-dim); font-size: 12.5px; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; }
+.auth-back:hover { color: var(--gold-hi); }
+
+/* --------------------------------------------------------------------------
+   Administrace
+   -------------------------------------------------------------------------- */
+.admin-shell { padding: calc(var(--header-h) + 46px) var(--pad-x) 80px; max-width: 1320px; margin-inline: auto; position: relative; z-index: 2; }
+.admin-head { display: flex; flex-wrap: wrap; gap: 20px; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+.admin-head h1 { font-size: clamp(28px, 4vw, 42px); color: var(--cream); }
+.admin-who { color: var(--cream-dim); font-size: 13.5px; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 34px; }
+.stat { border: 1px solid var(--line); padding: 24px 22px; background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent); }
+.stat dt { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.stat dd { font-family: var(--serif); font-size: 34px; color: var(--cream); margin-top: 10px; }
+.stat dd.small { font-size: 17px; }
+
+.panel { margin-top: 46px; border: 1px solid var(--line); }
+.panel-head { padding: 22px 26px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+.panel-head h2 { font-size: 21px; max-width: none; }
+.panel-body { padding: 26px; }
+.panel-body p { color: var(--cream-dim); font-size: 14.5px; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 15px 26px; border-bottom: 1px solid var(--line); }
+th { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 400; }
+td { color: var(--cream-dim); }
+tbody tr:hover { background: rgba(201, 168, 76, 0.04); }
+.pill { display: inline-block; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; padding: 5px 11px; border: 1px solid var(--line-strong); color: var(--gold-hi); }
+.pill[data-status="NEW"] { background: rgba(201, 168, 76, 0.14); border-color: var(--gold); }
+.pill[data-status="CONFIRMED"] { color: #9fd3a8; border-color: #4a7a52; }
+.pill[data-status="DECLINED"] { color: #d99b8f; border-color: #7a4a42; }
+.code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12.5px;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  color: var(--gold-hi);
+  word-break: break-all;
+  margin-top: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Galerie / dialog
+   -------------------------------------------------------------------------- */
+.gallery-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 30%);
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  margin-top: 44px;
+  padding-bottom: 16px;
+}
+.gallery-item { scroll-snap-align: center; position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--line-strong); overflow: hidden; background: var(--ink); cursor: zoom-in; padding: 0; }
+.gallery-item > svg, .gallery-item > img { width: 100%; height: 100%; object-fit: cover; }
+
+dialog {
+  border: 1px solid var(--line-strong);
+  background: var(--black);
+  color: var(--cream);
+  padding: 0;
+  max-width: min(1100px, 94vw);
+  max-height: 92svh;
+}
+dialog::backdrop { background: rgba(6, 6, 6, 0.86); backdrop-filter: blur(6px); }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.dialog-head p { font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); }
+.dialog-body { padding: 22px; }
+.dialog-close { background: transparent; border: 1px solid var(--line-strong); color: var(--gold-hi); padding: 10px 16px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; min-height: 44px; }
+
+/* Mobilní menu */
+.mobile-menu { width: min(420px, 92vw); }
+.mobile-menu nav { display: flex; flex-direction: column; }
+.mobile-menu nav a {
+  padding: 18px 4px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  text-decoration: none;
+}
+.mobile-menu nav a:hover { color: var(--gold-hi); }
+
+/* --------------------------------------------------------------------------
+   Zápatí
+   -------------------------------------------------------------------------- */
+.footer { position: relative; z-index: 2; border-top: 1px solid var(--line); padding: 64px var(--pad-x) 44px; text-align: center; }
+.footer-mark { width: 60px; height: 60px; margin: 0 auto 22px; }
+.footer-wm { font-family: var(--logo); font-size: 30px; letter-spacing: 0.34em; padding-left: 0.34em; color: var(--cream); }
+.footer-meta { margin-top: 18px; color: var(--cream-dim); font-size: 13.5px; letter-spacing: 0.08em; }
+.footer-meta a { color: var(--gold-hi); text-decoration: none; }
+.footer-meta a:hover { text-decoration: underline; }
+.footer-times { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-top: 18px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-lo); }
+.footer-signoff { margin-top: 24px; font-size: 11px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold-lo); }
+.footer-legal { margin-top: 26px; font-size: 12px; color: #807b73; /* 4.71:1 na černé — WCAG AA */ }
+
+/* --------------------------------------------------------------------------
+   Odhalování při scrollu
+   Primárně scroll-driven animace (běží na kompozitoru), s IntersectionObserver
+   fallbackem pro Firefox — viz src/components/RevealFallback.tsx
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes reveal-in {
+      from { opacity: 0; translate: 0 30px; }
+    }
+    .reveal {
+      animation: reveal-in 1s linear backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 62%;
+    }
+  }
+
+  @supports not ((animation-timeline: view()) and (animation-range: entry)) {
+    .reveal { opacity: 0; translate: 0 30px; transition: opacity 0.9s var(--ease), translate 0.9s var(--ease); }
+    .reveal[data-in="true"] { opacity: 1; translate: 0 0; }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Responzivita
+   -------------------------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .location-grid, .reserve-split { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  :root { --header-h: 72px; }
+  .values { grid-template-columns: 1fr; }
+  .value { border-right: none; }
+  .feature { grid-template-columns: 1fr; gap: 34px; }
+  .feature-flip .feature-copy { order: 1; }
+  .feature-flip .plate { order: 2; }
+  .nav { display: none; }
+  .icon-btn { display: inline-flex; }
+  .row2 { grid-template-columns: 1fr; }
+  .brand-wm { font-size: 20px; letter-spacing: 0.28em; }
+  .review-strip { grid-auto-columns: minmax(260px, 82%); }
+  .gallery-strip { grid-auto-columns: minmax(230px, 78%); }
+  th, td { padding: 13px 16px; }
+}
+
+@media (max-width: 560px) {
+  .brand-wm { display: none; }
+  .score { flex-direction: column; align-items: flex-start; }
+  .cta-row .btn { width: 100%; }
+}
+
+@media print {
+  .header, .subnav, .pattern-bg, .grain, .cta-row, .room-actions { display: none; }
+  body { background: #fff; color: #111; }
+}
+
+/* --------------------------------------------------------------------------
+   Textury (vzor citadely + filmové zrno) jako data-URI
+   -------------------------------------------------------------------------- */
+:root {
+  --pattern-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Cpath d='M0 75 L75 0 L150 75 L75 150 Z' fill='none' stroke='%239A7E32' stroke-width='0.7' opacity='0.4'/%3E%3Cpath d='M57.5 78.5 L57.5 64.5 L59.5 64.5 L59.5 62.5 L61.75 62.5 L61.75 60.5 L64.75 60.5 L64.75 57.25 L66.5 57.25 L66.5 55 L69 55 L69 52.5 L72.5 52.5 L72.5 51 L75 45.5 L77.5 51 L77.5 52.5 L81 52.5 L81 55 L82.5 55 L82.5 57.25 L85.25 57.25 L85.25 60.5 L88.25 60.5 L88.25 62.5 L90.5 62.5 L90.5 64.5 L92.5 64.5 L92.5 78.5 Z' fill='none' stroke='%239A7E32' stroke-width='1' stroke-linejoin='round'/%3E%3Ccircle cx='75' cy='45.5' r='0.85' fill='%239A7E32'/%3E%3Cpath d='M70 82 Q75 83.75 80 82' fill='none' stroke='%239A7E32' stroke-width='0.7' stroke-linecap='round'/%3E%3Cpath d='M65 84.25 Q75 86.38 85 84.25' fill='none' stroke='%239A7E32' stroke-width='0.7' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M59.5 86.5 Q75 89 90.5 86.5' fill='none' stroke='%239A7E32' stroke-width='0.7' stroke-linecap='round' opacity='0.45'/%3E%3Cpath d='M53.5 88.75 Q75 91.62 96.5 88.75' fill='none' stroke='%239A7E32' stroke-width='0.7' stroke-linecap='round' opacity='0.25'/%3E%3C/svg%3E");
+  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   Citadela Resort — doplňkové prvky
+   -------------------------------------------------------------------------- */
+
+/* podtitul pod logotypem */
+.logo-sub {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: clamp(11px, 1.7vw, 16px);
+  letter-spacing: 0.62em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 6px;
+  padding-left: 0.62em;
+}
+.footer-sub {
+  font-size: 11px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 6px;
+  padding-left: 0.5em;
+}
+
+/* tři čísla v hero sekci */
+.hero-stats {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 26px;
+  margin-top: 26px;
+}
+.hero-stats li {
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  border: 1px solid var(--line-strong);
+  padding: 9px 16px;
+}
+
+/* drobná poznámka pod odstavcem */
+.fine-note {
+  margin-top: 22px;
+  padding-left: 16px;
+  border-left: 2px solid var(--gold-lo);
+  color: var(--cream-dim);
+  font-size: 13.5px;
+  line-height: 1.65;
+  max-width: 56ch;
+}
+.fine-note strong { color: var(--gold-hi); }
+
+/* dvojice karet uvnitř feature řádku (půjčovna) */
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+.mini {
+  border: 1px solid var(--line);
+  padding: 22px 20px;
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent);
+}
+.mini svg { color: var(--gold); }
+.mini h3 {
+  font-style: italic;
+  font-size: 19px;
+  color: var(--gold-hi);
+  margin: 14px 0 8px;
+}
+.mini p { color: var(--cream-dim); font-size: 14px; }
+
+/* ceník */
+.rate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 44px;
+}
+.rate {
+  border: 1px solid var(--line-strong);
+  padding: 30px 26px;
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.04), transparent);
+  transition: border-color 0.45s, translate 0.45s var(--ease);
+}
+.rate:hover { border-color: var(--gold); translate: 0 -4px; }
+.rate-featured {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.12), transparent 70%);
+}
+.rate h3 { font-style: italic; font-size: 23px; color: var(--gold-hi); }
+.rate-note {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-lo);
+}
+.rate-price {
+  font-family: var(--serif);
+  font-size: clamp(26px, 3vw, 34px);
+  color: var(--cream);
+  margin-top: 20px;
+  line-height: 1.1;
+}
+.rate-meta { margin-top: 8px; color: var(--cream-dim); font-size: 13.5px; }
+.rate-caption {
+  margin-top: 24px;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold-hi);
+  font-size: 16px;
+}
+
+/* podmínky a storno */
+.terms-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(34px, 5vw, 66px);
+  margin-top: 52px;
+}
+.terms-heading {
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-family: var(--sans);
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.terms { list-style: none; }
+.terms li {
+  position: relative;
+  padding: 12px 0 12px 24px;
+  border-bottom: 1px solid var(--line);
+  color: var(--cream-dim);
+  font-size: 14.5px;
+}
+.terms li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 20px;
+  width: 5px;
+  height: 5px;
+  background: var(--gold);
+  rotate: 45deg;
+}
+
+@media (max-width: 1080px) {
+  .terms-grid { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   Fotografie
+   -------------------------------------------------------------------------- */
+
+/* Hero s fotkou potřebuje silnější závoj — logotyp je zlatý gradient
+   a na světlém denním snímku by se ztratil. */
+.hero[data-photo="true"]::after {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(10, 10, 10, 0.34) 0%, rgba(10, 10, 10, 0.68) 55%, var(--black) 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0.45) 30%, rgba(10, 10, 10, 0.82) 100%);
+}
+.hero[data-photo="true"] .hero-scene img {
+  filter: saturate(0.82) contrast(1.04) brightness(0.92);
+}
+
+/* Fotky uvnitř rámů dědí zlatý rám i vinětu z .plate */
+.plate > img,
+.room-media > img,
+.gallery-item > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dialog-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.dialog-caption {
+  margin-top: 16px;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--cream-dim);
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Zvětšovací kurzor jen tam, kde je co zvětšit */
+.gallery-item { cursor: zoom-in; }
+.gallery-item:hover > img { filter: brightness(1.08); }
+
+/* pruh pouze pro náhled, v aplikaci není */
+.preview-note{position:relative;z-index:70;background:rgba(201,168,76,.12);border-bottom:1px solid var(--line);
+  color:var(--cream-dim);font-size:12.5px;letter-spacing:.04em;padding:10px 6vw;text-align:center}
+.preview-note strong{color:var(--gold-hi)}
+</style>
+</head>
+<body>
+<div class="pattern-bg" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="header" id="hdr">
+  <a class="brand" href="#top"><svg viewBox="0 0 64 64" width="46" height="46" role="img" aria-label="Citadela"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w1" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<circle cx="32" cy="32" r="24.32" fill="none" stroke="url(#g1)" stroke-width="1.6"/>
+<circle cx="32" cy="32" r="22.19" fill="none" stroke="url(#g1)" stroke-width="0.8"/>
+<path d="M 17.07 39.25 L 17.07 27.31 L 18.77 27.31 L 18.77 25.60 L 20.69 25.60 L 20.69 23.89 L 21.97 23.89 L 21.97 22.61 L 23.25 22.61 L 23.25 21.12 L 24.75 21.12 L 24.75 22.61 L 24.32 22.61 L 24.32 21.12 L 25.81 21.12 L 25.81 22.61 L 25.60 22.61 L 25.60 19.20 L 26.88 19.20 L 26.88 17.07 L 28.37 17.07 L 28.37 15.36 L 29.87 15.36 L 29.87 17.07 L 31.15 17.07 L 31.15 15.79 L 31.47 15.79 L 32.00 11.09 L 32.53 15.79 L 32.85 15.79 L 32.85 17.07 L 34.13 17.07 L 34.13 15.36 L 35.63 15.36 L 35.63 17.07 L 37.12 17.07 L 37.12 19.20 L 38.40 19.20 L 38.40 22.61 L 38.19 22.61 L 38.19 21.12 L 39.68 21.12 L 39.68 22.61 L 39.25 22.61 L 39.25 21.12 L 40.75 21.12 L 40.75 22.61 L 42.03 22.61 L 42.03 23.89 L 43.31 23.89 L 43.31 25.60 L 45.23 25.60 L 45.23 27.31 L 46.93 27.31 L 46.93 39.25 Z" fill="none" stroke="url(#g1)" stroke-width="1.6" stroke-linejoin="round"/>
+<circle cx="32" cy="11.09" r="0.73" fill="url(#g1)"/>
+<path d="M 27.73 42.24 Q 32 43.73 36.27 42.24" fill="none" stroke="url(#g1)" stroke-width="1.12" stroke-linecap="round"/>
+<path d="M 23.47 44.16 Q 32 45.97 40.53 44.16" fill="none" stroke="url(#g1)" stroke-width="1.12" stroke-linecap="round" opacity="0.7"/>
+<path d="M 18.77 46.08 Q 32 48.21 45.23 46.08" fill="none" stroke="url(#g1)" stroke-width="1.12" stroke-linecap="round" opacity="0.45"/>
+<path d="M 13.65 48 Q 32 50.45 50.35 48" fill="none" stroke="url(#g1)" stroke-width="1.12" stroke-linecap="round" opacity="0.25"/></svg><span class="brand-wm">CITADELA</span></a>
+  <div class="header-right">
+    <nav class="nav" aria-label="Menu">
+      <a href="#rooms">Bedrooms</a>
+      <a href="#wellness">Wellness</a>
+      <a href="#facilities">Facilities</a>
+      <a href="#pricing">Rates</a>
+      <a href="#contact">Contact</a>
+      <a href="#login">Sign in</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <a href="citadela-nahled-cs.html" hreflang="cs">CZ</a>
+      <a href="citadela-nahled-en.html" hreflang="en" aria-current="true">EN</a>
+    </div>
+    <a class="btn btn-solid" href="https://www.booking.com/hotel/cz/citadela.html?aid=DEMO&group_adults=2&no_rooms=1" target="_blank" rel="noopener noreferrer"><span>Enquire</span></a>
+    <button class="icon-btn" type="button" aria-label="Menu" id="menuBtn">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<p class="preview-note"><strong>Preview</strong> — Static preview — content and styling come straight from the app sources. The server (database, sign-in, iCal) is not running here; Booking.com buttons point at a demo URL.</p>
+
+<section class="hero" id="top" data-photo="true">
+  <div class="hero-scene"><img src="photos/vila-funny-f004-5a04-1081218.jpg" alt="Citadela Resort seen from above — the villa, its terrace and the garden, with the hills beyond" width="1183" height="720" fetchpriority="high" decoding="async"></div>
+  <div class="hero-inner">
+    <p class="hero-place">Rozdrojovice · Brněnská přehrada</p>
+    <p class="logotype">CITADELA</p>
+    <p class="logo-sub">RESORT</p>
+    <h1>The whole villa. One party at a time.</h1>
+    <p class="hero-sub">Eight bedrooms, four social spaces and a wellness floor that never closes — held above the Brno reservoir for up to forty guests, and for nobody else while you are here.</p>
+    <ul class="hero-stats"><li>up to 40 guests</li><li>8 bedrooms</li><li>pool at 29 °C</li></ul>
+    <div class="cta-row">
+      <a class="btn btn-solid" href="https://www.booking.com/hotel/cz/citadela.html?aid=DEMO&group_adults=2&no_rooms=1" target="_blank" rel="noopener noreferrer"><span>Check availability</span></a>
+      <a class="btn" href="#rooms"><span>See the house</span></a>
+    </div>
+    <div class="divider-dot"><span></span></div>
+  </div>
+</section>
+
+<nav class="subnav" aria-label="Menu">
+  <div class="subnav-inner">
+    <a href="#rooms">Bedrooms</a>
+    <a href="#wellness">Wellness</a>
+    <a href="#facilities">Facilities</a>
+    <a href="#pricing">Rates</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main id="main">
+<div class="badges">
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 15q3-2 6 0t6 0 6 0M3 19q3-2 6 0t6 0 6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 12V5.5A2.5 2.5 0 0 1 13 5.5M16 12V5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 8.5h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Heated indoor pool, 29 °C</span></div>
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="10" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 7c0-1.3 1-1.7 1-2.8M11 7c0-1.3 1-1.7 1-2.8M15 7c0-1.3 1-1.7 1-2.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6 20v-4h12v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Finnish sauna, unlimited</span></div>
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 12h18v4a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 12V7.5A2.5 2.5 0 0 1 12 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="8" cy="16" r=".9" fill="currentColor" />
+      <circle cx="12" cy="16.6" r=".9" fill="currentColor" />
+      <circle cx="16" cy="16" r=".9" fill="currentColor" />
+      <path d="M5 22l1-2M19 22l-1-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Whirlpool</span></div>
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9.5 17V7.5h3a2.75 2.75 0 0 1 0 5.5h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Free parking for 8 cars on site</span></div>
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5.5 12.4a10 10 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="19.5" r="1.1" fill="currentColor" /></svg><span>250 Mbit Wi-Fi throughout</span></div>
+  <div class="badge"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 5h16l-1.6 7.5a5 5 0 0 1-4.9 4H10.5a5 5 0 0 1-4.9-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9 17l-1.5 5M15 17l1.5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 9h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Summer kitchen with grill and oven</span></div>
+</div>
+
+<section class="section">
+  <div class="feature reveal" style="border-top:0">
+    <div class="feature-copy">
+      <p class="eyebrow">The House</p>
+      <h2>Cross the threshold of the everyday.</h2>
+      <p class="lead">The road narrows, the trees close in, the gate opens on its own — and then the house. Eight bedrooms across two floors, four social spaces, and a wellness floor below. A lounge with a billiard table, a dance floor, a sound system wired through to the terrace, and sofas deep enough that nobody moves for hours.</p>
+      <p class="lead">It is a house built for a group that wants to be left alone. Families take it for the pool and the private shore; closed companies take it for the space and the discretion. Guests are adults, the grounds are fenced, and what happens inside stays between the people who are there.</p>
+      <p class="fine-note">Citadela Resort is arranged for adult guests and rented to a single party at a time. Pets are not permitted.</p>
+    </div>
+    <div class="plate"><img src="photos/wellness-amp-spa-zona-7dfd-5a05-1081253.jpg" alt="The indoor pool, lit turquoise, with loungers and the whirlpool alongside" width="1280" height="853" loading="lazy" decoding="async"><span class="corner corner-tl"></span><span class="corner corner-tr"></span><span class="corner corner-bl"></span><span class="corner corner-br"></span></div>
+  </div>
+
+  <ul class="gallery-strip" aria-label="Photo gallery">
+    <li><button type="button" class="gallery-item" data-i="0" aria-label="Citadela Resort seen from above — the villa, its terrace and the garden, with the hills beyond — Image 1 of 4"><img src="photos/vila-funny-f004-5a04-1081218.jpg" alt="Citadela Resort seen from above — the villa, its terrace and the garden, with the hills beyond" width="1183" height="720" loading="lazy" decoding="async"></button></li>
+    <li><button type="button" class="gallery-item" data-i="1" aria-label="The indoor pool, lit turquoise, with loungers and the whirlpool alongside — Image 2 of 4"><img src="photos/wellness-amp-spa-zona-7dfd-5a05-1081253.jpg" alt="The indoor pool, lit turquoise, with loungers and the whirlpool alongside" width="1280" height="853" loading="lazy" decoding="async"></button></li>
+    <li><button type="button" class="gallery-item" data-i="2" aria-label="Inside the Finnish sauna, looking through the glass door to the pool — Image 3 of 4"><img src="photos/wellness-amp-spa-zona-28b5-5a05-1081247.jpg" alt="Inside the Finnish sauna, looking through the glass door to the pool" width="1280" height="853" loading="lazy" decoding="async"></button></li>
+    <li><button type="button" class="gallery-item" data-i="3" aria-label="The Silver Room bathroom, with its corner bath and heated towel rail — Image 4 of 4"><img src="photos/stribrny-pokoj-6277-5a05-1081240.jpg" alt="The Silver Room bathroom, with its corner bath and heated towel rail" width="1280" height="853" loading="lazy" decoding="async"></button></li>
+  </ul>
+</section>
+
+<section class="section reveal">
+  <p class="eyebrow">Why Citadela</p>
+  <h2>Taken whole, by one party.</h2>
+  <div class="values">
+    <article class="value"><p class="value-num">I</p><h3>The house answers only to you</h3><p>Citadela Resort is never shared between parties. Gates close behind your cars, the grounds are fenced, and for the length of your stay the address belongs to your group alone — which is what makes it work equally for a family week and a closed celebration.</p></article>
+    <article class="value"><p class="value-num">II</p><h3>Wellness with no clock on it</h3><p>A heated indoor pool held at 29 °C all year, a Finnish sauna, an infrared cabin and a whirlpool — none of them booked by the hour, none of them shared with strangers. Towels, sheets and sauna linen are laid out and included.</p></article>
+    <article class="value"><p class="value-num">III</p><h3>The reservoir, three hundred metres down</h3><p>Rozdrojovice sits on the quiet western shore of Brněnská přehrada, nine kilometres from the centre of Brno. Beaches, forest paths and the water are a short walk from the gate; the city is close enough for dinner and far enough not to be heard.</p></article>
+  </div>
+</section>
+
+<section class="section reveal" id="rooms">
+  <p class="eyebrow">The Bedrooms</p>
+  <h2>Eight rooms, each with its own character.</h2>
+  <p class="lead">Bedrooms are not let individually — the villa is taken whole. Below is how the beds are arranged, so you can divide the house among your group before you arrive.</p>
+  <div class="rooms">
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w2" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w2)"/>
+<circle cx="220" cy="150" r="30" fill="url(#g2)" opacity="0.38"/><rect x="180" y="150" width="72" height="120" fill="none" stroke="url(#g2)" stroke-width="2"/><line x1="216" y1="150" x2="216" y2="124" stroke="url(#g2)" stroke-width="2"/><rect x="209" y="116" width="14" height="9" fill="url(#g2)"/><rect x="320" y="104" width="72" height="166" fill="none" stroke="url(#g2)" stroke-width="2"/><line x1="356" y1="104" x2="356" y2="78" stroke="url(#g2)" stroke-width="2"/><rect x="349" y="70" width="14" height="9" fill="url(#g2)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g2)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>The Gold Room</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Private bathroom</span></p>
+        <p>Spacious, bright and modern, with underfloor heating and a large private bathroom with a corner bath.</p>
+        <ul class="room-amenities"><li>Double bed</li><li>Corner bath</li><li>WC &amp; bidet</li><li>Underfloor heating</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><img src="photos/stribrny-pokoj-6277-5a05-1081240.jpg" alt="The Silver Room bathroom, with its corner bath and heated towel rail" width="1280" height="853" loading="lazy" decoding="async"></div>
+      <div class="room-body">
+        <h3>The Silver Room</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Private bathroom</span></p>
+        <p>A twin of the Gold Room in comfort — light, generous, with its own large bathroom and corner bath.</p>
+        <ul class="room-amenities"><li>Double bed</li><li>Corner bath</li><li>WC &amp; bidet</li><li>Underfloor heating</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w3" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w3)"/>
+<circle cx="340" cy="150" r="42" fill="url(#g3)" opacity="0.38"/><rect x="180" y="58" width="72" height="212" fill="none" stroke="url(#g3)" stroke-width="2"/><line x1="216" y1="58" x2="216" y2="32" stroke="url(#g3)" stroke-width="2"/><rect x="209" y="24" width="14" height="9" fill="url(#g3)"/><rect x="250" y="150" width="72" height="120" fill="none" stroke="url(#g3)" stroke-width="2"/><line x1="286" y1="150" x2="286" y2="124" stroke="url(#g3)" stroke-width="2"/><rect x="279" y="116" width="14" height="9" fill="url(#g3)"/><rect x="320" y="104" width="72" height="166" fill="none" stroke="url(#g3)" stroke-width="2"/><line x1="356" y1="104" x2="356" y2="78" stroke="url(#g3)" stroke-width="2"/><rect x="349" y="70" width="14" height="9" fill="url(#g3)"/><rect x="390" y="58" width="72" height="212" fill="none" stroke="url(#g3)" stroke-width="2"/><line x1="426" y1="58" x2="426" y2="32" stroke="url(#g3)" stroke-width="2"/><rect x="419" y="24" width="14" height="9" fill="url(#g3)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g3)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>The Silver Room II</h3>
+        <p class="room-facts"><span>sleeps 2–3</span><span>Private bathroom</span></p>
+        <p>The same room with space for a third guest: a double bed and one separate single, plus a private bathroom with a corner bath.</p>
+        <ul class="room-amenities"><li>Double bed</li><li>Additional single bed</li><li>Corner bath</li><li>WC &amp; bidet</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w4" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w4)"/>
+<circle cx="220" cy="150" r="30" fill="url(#g4)" opacity="0.38"/><rect x="180" y="150" width="72" height="120" fill="none" stroke="url(#g4)" stroke-width="2"/><line x1="216" y1="150" x2="216" y2="124" stroke="url(#g4)" stroke-width="2"/><rect x="209" y="116" width="14" height="9" fill="url(#g4)"/><rect x="320" y="104" width="72" height="166" fill="none" stroke="url(#g4)" stroke-width="2"/><line x1="356" y1="104" x2="356" y2="78" stroke="url(#g4)" stroke-width="2"/><rect x="349" y="70" width="14" height="9" fill="url(#g4)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g4)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>The Bronze Room</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Shared bathrooms on the ground floor</span></p>
+        <p>Furnished in a modern Japanese spirit, with a balcony looking out over the Brno reservoir. Showers and WCs on the ground floor.</p>
+        <ul class="room-amenities"><li>Double bed</li><li>Balcony over the reservoir</li><li>Japanese-inspired</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w5" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w5)"/>
+<circle cx="280" cy="150" r="36" fill="url(#g5)" opacity="0.38"/><rect x="180" y="104" width="72" height="166" fill="none" stroke="url(#g5)" stroke-width="2"/><line x1="216" y1="104" x2="216" y2="78" stroke="url(#g5)" stroke-width="2"/><rect x="209" y="70" width="14" height="9" fill="url(#g5)"/><rect x="273.3333333333333" y="58" width="72" height="212" fill="none" stroke="url(#g5)" stroke-width="2"/><line x1="309.3333333333333" y1="58" x2="309.3333333333333" y2="32" stroke="url(#g5)" stroke-width="2"/><rect x="302.3333333333333" y="24" width="14" height="9" fill="url(#g5)"/><rect x="366.66666666666663" y="150" width="72" height="120" fill="none" stroke="url(#g5)" stroke-width="2"/><line x1="402.66666666666663" y1="150" x2="402.66666666666663" y2="124" stroke="url(#g5)" stroke-width="2"/><rect x="395.66666666666663" y="116" width="14" height="9" fill="url(#g5)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g5)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>The Blue Room</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Shared bathrooms on the ground floor</span></p>
+        <p>Bright, modern and quiet, with showers and WCs on the ground floor.</p>
+        <ul class="room-amenities"><li>Double bed</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g6" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w6" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w6)"/>
+<circle cx="340" cy="150" r="42" fill="url(#g6)" opacity="0.38"/><rect x="180" y="58" width="72" height="212" fill="none" stroke="url(#g6)" stroke-width="2"/><line x1="216" y1="58" x2="216" y2="32" stroke="url(#g6)" stroke-width="2"/><rect x="209" y="24" width="14" height="9" fill="url(#g6)"/><rect x="250" y="150" width="72" height="120" fill="none" stroke="url(#g6)" stroke-width="2"/><line x1="286" y1="150" x2="286" y2="124" stroke="url(#g6)" stroke-width="2"/><rect x="279" y="116" width="14" height="9" fill="url(#g6)"/><rect x="320" y="104" width="72" height="166" fill="none" stroke="url(#g6)" stroke-width="2"/><line x1="356" y1="104" x2="356" y2="78" stroke="url(#g6)" stroke-width="2"/><rect x="349" y="70" width="14" height="9" fill="url(#g6)"/><rect x="390" y="58" width="72" height="212" fill="none" stroke="url(#g6)" stroke-width="2"/><line x1="426" y1="58" x2="426" y2="32" stroke="url(#g6)" stroke-width="2"/><rect x="419" y="24" width="14" height="9" fill="url(#g6)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g6)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>The Green Room</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Shared bathrooms on the ground floor</span></p>
+        <p>Bright, modern and quiet, with showers and WCs on the ground floor.</p>
+        <ul class="room-amenities"><li>Double bed</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w7" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w7)"/>
+<circle cx="220" cy="150" r="30" fill="url(#g7)" opacity="0.38"/><rect x="180" y="150" width="72" height="120" fill="none" stroke="url(#g7)" stroke-width="2"/><line x1="216" y1="150" x2="216" y2="124" stroke="url(#g7)" stroke-width="2"/><rect x="209" y="116" width="14" height="9" fill="url(#g7)"/><rect x="320" y="104" width="72" height="166" fill="none" stroke="url(#g7)" stroke-width="2"/><line x1="356" y1="104" x2="356" y2="78" stroke="url(#g7)" stroke-width="2"/><rect x="349" y="70" width="14" height="9" fill="url(#g7)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g7)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>Mezzanine — Upper</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Shared bathrooms on the ground floor</span></p>
+        <p>The upper half of the split-level room: light, airy and open. Shower and WC in the lower half of the mezzanine.</p>
+        <ul class="room-amenities"><li>Double bed</li></ul>
+      </div>
+    </article>
+    <article class="room">
+      <div class="room-media"><svg viewBox="0 0 640 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g8" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w8" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="480" fill="#0c0b08"/><ellipse cx="320" cy="250" rx="300" ry="230" fill="url(#w8)"/>
+<circle cx="280" cy="150" r="36" fill="url(#g8)" opacity="0.38"/><rect x="180" y="104" width="72" height="166" fill="none" stroke="url(#g8)" stroke-width="2"/><line x1="216" y1="104" x2="216" y2="78" stroke="url(#g8)" stroke-width="2"/><rect x="209" y="70" width="14" height="9" fill="url(#g8)"/><rect x="273.3333333333333" y="58" width="72" height="212" fill="none" stroke="url(#g8)" stroke-width="2"/><line x1="309.3333333333333" y1="58" x2="309.3333333333333" y2="32" stroke="url(#g8)" stroke-width="2"/><rect x="302.3333333333333" y="24" width="14" height="9" fill="url(#g8)"/><rect x="366.66666666666663" y="150" width="72" height="120" fill="none" stroke="url(#g8)" stroke-width="2"/><line x1="402.66666666666663" y1="150" x2="402.66666666666663" y2="124" stroke="url(#g8)" stroke-width="2"/><rect x="395.66666666666663" y="116" width="14" height="9" fill="url(#g8)"/>
+<line x1="0" y1="270" x2="640" y2="270" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="278" x2="550" y2="278" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="293" x2="510" y2="293" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="308" x2="470" y2="308" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="323" x2="550" y2="323" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="338" x2="510" y2="338" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="353" x2="470" y2="353" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="368" x2="550" y2="368" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/><line x1="130" y1="383" x2="510" y2="383" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.10"/><line x1="170" y1="398" x2="470" y2="398" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/><line x1="90" y1="413" x2="550" y2="413" stroke="url(#g8)" stroke-width="1.3" stroke-linecap="round" opacity="0.06"/></svg></div>
+      <div class="room-body">
+        <h3>Mezzanine — Lower</h3>
+        <p class="room-facts"><span>sleeps 2</span><span>Private bathroom</span></p>
+        <p>The lower half of the split-level room, with the shower, WC and bidet that serve the mezzanine.</p>
+        <ul class="room-amenities"><li>Double bed</li><li>WC &amp; bidet</li></ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section section-tight" id="wellness">
+  <div class="feature feature-flip reveal">
+    <div class="feature-copy">
+      <p class="eyebrow">Wellness &amp; Spa</p>
+      <h2>Warm water, dry heat, no closing time.</h2>
+      <p class="lead">The wellness floor is yours for the whole stay, without booking slots or shared hours. The pool is heated to 29 °C all year round; beside it are a Finnish sauna, an infrared cabin, a whirlpool and a shower. Towels, bathrobes and sauna sheets are provided.</p>
+      <ul class="tags"><li>Indoor pool at 29 °C, year-round</li><li>Finnish sauna, unlimited</li><li>Infrared cabin, unlimited</li><li>Whirlpool</li><li>Wood stove in the spa</li><li>Linen &amp; towels included</li></ul>
+    </div>
+    <div class="plate"><img src="photos/wellness-amp-spa-zona-28b5-5a05-1081247.jpg" alt="Inside the Finnish sauna, looking through the glass door to the pool" width="1280" height="853" loading="lazy" decoding="async"><span class="corner corner-tl"></span><span class="corner corner-tr"></span><span class="corner corner-bl"></span><span class="corner corner-br"></span></div>
+  </div>
+</section>
+
+<section class="section reveal" id="facilities">
+  <p class="eyebrow">Facilities</p>
+  <h2>Everything considered, nothing announced.</h2>
+  <p class="lead">The list below is complete. Anything not on it, ask — the answer is usually yes.</p>
+  <ul class="facilities">
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 15q3-2 6 0t6 0 6 0M3 19q3-2 6 0t6 0 6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 12V5.5A2.5 2.5 0 0 1 13 5.5M16 12V5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 8.5h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Heated indoor pool, 29 °C</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="10" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 7c0-1.3 1-1.7 1-2.8M11 7c0-1.3 1-1.7 1-2.8M15 7c0-1.3 1-1.7 1-2.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6 20v-4h12v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Finnish sauna, unlimited</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="10" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 7c0-1.3 1-1.7 1-2.8M11 7c0-1.3 1-1.7 1-2.8M15 7c0-1.3 1-1.7 1-2.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6 20v-4h12v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Infrared sauna, unlimited</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 12h18v4a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 12V7.5A2.5 2.5 0 0 1 12 7.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="8" cy="16" r=".9" fill="currentColor" />
+      <circle cx="12" cy="16.6" r=".9" fill="currentColor" />
+      <circle cx="16" cy="16" r=".9" fill="currentColor" />
+      <path d="M5 22l1-2M19 22l-1-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Whirlpool</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 20 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5.5 12.4a10 10 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="19.5" r="1.1" fill="currentColor" /></svg><span>250 Mbit Wi-Fi throughout</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9.5 17V7.5h3a2.75 2.75 0 0 1 0 5.5h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Free parking for 8 cars on site</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="9" cy="12" r="1.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="15" cy="10" r="1.9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5 8.2h.01M19 15.8h.01" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Billiard table</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Dance floor</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9v6h3l5 4V5L7 9z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M16 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>ALTO sound system, mixing desk &amp; light show</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Dance pole</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 5h16l-1.6 7.5a5 5 0 0 1-4.9 4H10.5a5 5 0 0 1-4.9-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9 17l-1.5 5M15 17l1.5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 9h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Summer kitchen with grill and oven</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 14c1.9 0 3-1.3 3-2.8 0-2.1-2.3-2.9-1.9-5.5-1.8.9-3.2 2.7-3.2 4.8C9.9 12.6 10.8 14 12 14z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M4 18l16 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6.5 21l11-4M17.5 21l-11-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Fire pit, wood and charcoal included</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 5h16l-1.6 7.5a5 5 0 0 1-4.9 4H10.5a5 5 0 0 1-4.9-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M9 17l-1.5 5M15 17l1.5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 9h10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Rotating spit for a whole hog</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M3 11h18M8 4v7M7 15h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="16" cy="15.5" r="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Fully equipped kitchen</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Dishwasher, oven, induction hob, microwave</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h13a4 4 0 0 1 0 8H8a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M17 10h1.6a2.4 2.4 0 0 1 0 4.8H17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 6.5c0-1 1-1.2 1-2.2M12 6.5c0-1 1-1.2 1-2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5 20h13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Electra twin-group coffee machine — coffee included</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="14" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M7 6.5h.01M10 6.5h.01" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Washing machine &amp; dryer</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8 21h8M12 17v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Three 45" 4K TVs, Netflix, O2 TV &amp; satellite</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Underfloor heating on the ground floor</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Remote-controlled entrance gate</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Fully fenced grounds</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Sunbeds</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Outdoor seating</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 21v-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M12 14c-3.5 0-5-2-5-4.5S9 5 12 5s5 2 5 4.5S15.5 14 12 14z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M4 21h16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Large garden</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Bed linen, towels &amp; sauna sheets</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5.6 5.6l12.8 12.8M8 13h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Non-smoking indoors</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M2 15q5 2 10 0t10 0M2 19q5 2 10 0t10 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Reservoir view</span></li>
+    <li><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Arranged for adult guests</span></li>
+  </ul>
+</section>
+
+<section class="section section-tight">
+  <div class="feature reveal">
+    <div class="feature-copy">
+      <p class="eyebrow">Getting around</p>
+      <h2>Explore in silence. Leave nothing behind.</h2>
+      <p class="lead">Electric scooters can be unlocked through an app for the length of your stay, and a chopper is available on request. Trace the shoreline before the day wakes, follow the gravel paths the maps forget, and come back whenever the light tells you to.</p>
+      <div class="mini-grid"><div class="mini"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><circle cx="5.5" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="18.5" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M16.5 18H8.5L15 6h-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M15 6h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><h3>Electric scooters</h3><p>Unlocked from an app, as many as your group needs, for as long as you are here.</p></div><div class="mini"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><circle cx="5.5" cy="17" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="18.5" cy="17" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M8.7 17h6.6M9 13h5l2-4h2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M14 9l-3.5 4M6 13l2-3h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><h3>Chopper</h3><p>Available on request — ask when you enquire and we will have it waiting.</p></div></div>
+      <p class="fine-note">Rentals are charged separately from the stay.</p>
+    </div>
+    <div class="plate"><svg viewBox="0 0 640 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g9" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w9" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<rect width="640" height="460" fill="#0c0b08"/><ellipse cx="320" cy="203" rx="320" ry="207" fill="url(#w9)"/>
+<circle cx="320" cy="167" r="40" fill="url(#g9)" opacity="0.5"/>
+<line x1="0" y1="193" x2="640" y2="193" stroke="#E7CE84" stroke-width="1.6" opacity="0.7"/><line x1="90" y1="201" x2="550" y2="201" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="130" y1="216" x2="510" y2="216" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.49"/><line x1="170" y1="231" x2="470" y2="231" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.42"/><line x1="90" y1="246" x2="550" y2="246" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.36"/><line x1="130" y1="261" x2="510" y2="261" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.29"/><line x1="170" y1="276" x2="470" y2="276" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.23"/><line x1="90" y1="291" x2="550" y2="291" stroke="url(#g9)" stroke-width="1.3" stroke-linecap="round" opacity="0.16"/>
+<circle cx="253" cy="320" r="23" stroke="url(#g9)" fill="none" stroke-width="3"/><circle cx="253" cy="320" r="9.2" stroke="url(#g9)" fill="none" stroke-width="2.1"/>
+<circle cx="387" cy="320" r="23" stroke="url(#g9)" fill="none" stroke-width="3"/><circle cx="387" cy="320" r="9.2" stroke="url(#g9)" fill="none" stroke-width="2.1"/>
+<path d="M 269 310 Q 320 319 361 308" stroke="url(#g9)" fill="none" stroke-width="3" stroke-linecap="round"/>
+<path d="M 387 306 L 398 171" stroke="url(#g9)" fill="none" stroke-width="3.3" stroke-linecap="round"/>
+<path d="M 364 173 L 419 166" stroke="url(#g9)" fill="none" stroke-width="3" stroke-linecap="round"/>
+<circle cx="364" cy="173" r="4.6" fill="url(#g9)"/></svg><span class="corner corner-tl"></span><span class="corner corner-tr"></span><span class="corner corner-bl"></span><span class="corner corner-br"></span></div>
+  </div>
+</section>
+
+<section class="section reveal" id="pricing">
+  <p class="eyebrow">Rates</p>
+  <h2>One price, the whole house.</h2>
+  <p class="lead">Rates are for the entire villa, not per person or per room. In high season the house is let by the week, Sunday to Sunday.</p>
+  <div class="rate-grid">
+    <article class="rate rate-featured">
+      <h3>Week</h3>
+      <p class="rate-note">Any season · Sunday to Sunday</p>
+      <p class="rate-price">CZK 85,000</p>
+      <p class="rate-meta">6 nights · for the whole villa</p>
+    </article>
+    <article class="rate">
+      <h3>Christmas</h3>
+      <p class="rate-note">Fixed period</p>
+      <p class="rate-price">CZK 75,000</p>
+      <p class="rate-meta">4 nights · for the whole villa</p>
+    </article>
+    <article class="rate">
+      <h3>New Year</h3>
+      <p class="rate-note">Fixed period</p>
+      <p class="rate-price">CZK 150,000</p>
+      <p class="rate-meta">5 nights · for the whole villa</p>
+    </article>
+    <article class="rate">
+      <h3>Easter</h3>
+      <p class="rate-note">Fixed period</p>
+      <p class="rate-price">CZK 75,000</p>
+      <p class="rate-meta">4 nights · for the whole villa</p>
+    </article>
+  </div>
+  <p class="rate-caption">price includes 25 guests · CZK 300 per additional guest, per night</p>
+  <div class="terms-grid">
+    <div>
+      <h3 class="terms-heading">Good to know</h3>
+      <ul class="terms">
+        <li>Refundable damage deposit of CZK 20,000.</li>
+        <li>A booking becomes binding once a 50% deposit is paid.</li>
+        <li>Municipal tourist tax of CZK 30 per adult, per night.</li>
+        <li>Arrival from 16:00, departure by 10:00.</li>
+        <li>In high season only full weeks are available, Sunday to Sunday.</li>
+        <li>Outside high season the length of stay is always open to discussion.</li>
+        <li>Please state the exact number of guests; capacity is 40 adults.</li>
+        <li>Parking is included.</li>
+        <li>Pets are not permitted.</li>
+        <li>Energy is billed after the stay; consumption is visible throughout. Water is included.</li>
+        <li>If the final tidy-up is not done, a fee of CZK 2,000 applies.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="terms-heading">Cancellation</h3>
+      <ul class="terms"><li>10% of the total when cancelling 91 days or fewer before arrival</li><li>50% of the total when cancelling 61 days or fewer before arrival</li><li>70% of the total when cancelling 60 days or fewer before arrival</li><li>100% of the total when cancelling 29 days or fewer before arrival</li></ul>
+      <p class="fine-note">You may nominate a replacement party to take over the booking in full, in which case no cancellation fee applies.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section reveal">
+  <p class="eyebrow">Table</p>
+  <h2>Cook, order in, or hand it over.</h2>
+  <div class="location-grid">
+    <div>
+      <p class="lead">The kitchen is fully equipped and the coffee is on us. Outside there is a fire pit with a 50 × 100 cm grill grate, skewers, and a rotating spit big enough for a whole hog or lamb. A chef can cook for you in the house, or a caterer can deliver.</p>
+      <p class="fine-note"><strong>Shops:</strong> Convenience store 800 m · Penny and Lidl 4 km</p>
+    </div>
+    <div>
+      <h3 class="terms-heading">Within 800 metres</h3>
+      <ul class="distances"><li><span>Hostinec U Helánů</span><span>800 m</span></li><li><span>Restaurace U Ševčíků</span><span>800 m</span></li><li><span>Hotel Atlantis</span><span>800 m</span></li><li><span>Maximus Resort</span><span>800 m</span></li><li><span>Restaurace Princezna</span><span>800 m</span></li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="section reveal" id="reviews">
+  <p class="eyebrow">Guests</p>
+  <h2>What is said afterwards.</h2>
+  <div class="score">
+    <p class="score-badge">9.1</p>
+    <div>
+      <p class="score-label">Booking.com rating</p>
+      <p class="score-count">128 reviews</p>
+      <a href="https://www.booking.com/hotel/cz/citadela.html?aid=DEMO&group_adults=2&no_rooms=1&tab=reviews" target="_blank" rel="noopener noreferrer">Read all reviews on Booking.com</a>
+    </div>
+  </div>
+  <p class="reserve-note">Source: Booking.com — quotes appear once real reviews are in place</p>
+</section>
+
+<section class="section reveal">
+  <p class="eyebrow">Location</p>
+  <h2>Nine kilometres, another world.</h2>
+  <div class="location-grid">
+    <div>
+      <p class="lead">Za Humny 262 sits in a quiet corner of Rozdrojovice on the western shore of the Brno reservoir. The road is good and passable all year, and there is room for eight cars behind the gate.</p>
+      <ul class="distances"><li><span>Reservoir shore</span><span>300 m</span></li><li><span>Restaurants</span><span>800 m</span></li><li><span>Brno city centre</span><span>9 km</span></li><li><span>Veveří Castle</span><span>6 km</span></li><li><span>Penny &amp; Lidl</span><span>4 km</span></li><li><span>Brno–Tuřany Airport</span><span>22 km</span></li></ul>
+      <a class="btn" href="https://www.openstreetmap.org/?mlat=49.25069&amp;mlon=16.51027#map=15/49.25069/16.51027" target="_blank" rel="noopener noreferrer" style="margin-top:28px"><span>Open in maps</span></a>
+    </div>
+    <div class="map-frame">
+      <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=16.49027%2C49.23869%2C16.530269999999998%2C49.26269&amp;layer=mapnik&amp;marker=49.25069%2C16.51027" title="Nine kilometres, another world." loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:40px"><strong style="color:var(--gold-hi)">Water, forest, and the city when you want it.</strong><br>Walks straight from the gate, cycling along the reservoir, beaches for swimming and sunbathing, and a wellness resort nearby for treatments. Veveří Castle and the Podkomorské lesy nature park are within an afternoon's ride, and Brno is close enough for a concert or an exhibition.</p>
+</section>
+
+<section class="section reveal" id="contact">
+  <p class="eyebrow eyebrow-center">The Invitation</p>
+  <h2 class="h2-center">Tell us your dates.</h2>
+  <p class="lead lead-center">Citadela Resort takes one party at a time. Send us your dates and the size of your group and a personal reply will follow within the day.</p>
+  <div class="reserve-split">
+    <div class="reserve-card">
+      <h3>Booking.com</h3>
+      <p class="reserve-note">Instant confirmation, best available rate.</p>
+      <a class="btn btn-solid btn-block" href="https://www.booking.com/hotel/cz/citadela.html?aid=DEMO&group_adults=2&no_rooms=1" target="_blank" rel="noopener noreferrer" style="margin-top:24px"><span>Check availability on Booking.com</span></a>
+      <p class="reserve-note" style="margin-top:22px"><a href="mailto:info@citadelaresort.cz">info@citadelaresort.cz</a><br><a href="tel:+420777130013">+420 777 130 013</a><br>Za Humny 262, 664 34 Rozdrojovice</p>
+    </div>
+
+    <form class="reserve-card" id="enq">
+      <fieldset>
+        <legend>Your enquiry</legend>
+        <div class="row2">
+          <div class="field"><label for="arrival">Arrival</label><input id="arrival" name="arrival" type="date" required></div>
+          <div class="field"><label for="departure">Departure</label><input id="departure" name="departure" type="date" required></div>
+        </div>
+        <span class="field-error" id="dateErr" hidden role="alert">The departure date must fall after the arrival date.</span>
+        <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" required maxlength="120" autocomplete="name" placeholder="As you'd like to be greeted"></div>
+        <div class="row2">
+          <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="vy@example.com"></div>
+          <div class="field"><label for="phone">Phone <span class="optional">(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>
+        </div>
+        <div class="field"><label for="guests">Guests</label><select id="guests" name="guests"><option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option><option value="5">5 guests</option><option value="6">6 guests</option><option value="7">7 guests</option><option value="8">8 guests</option><option value="9">9 guests</option><option value="10" selected>10 guests</option><option value="11">11 guests</option><option value="12">12 guests</option><option value="13">13 guests</option><option value="14">14 guests</option><option value="15">15 guests</option><option value="16">16 guests</option><option value="17">17 guests</option><option value="18">18 guests</option><option value="19">19 guests</option><option value="20">20 guests</option><option value="21">21 guests</option><option value="22">22 guests</option><option value="23">23 guests</option><option value="24">24 guests</option><option value="25">25 guests</option><option value="26">26 guests</option><option value="27">27 guests</option><option value="28">28 guests</option><option value="29">29 guests</option><option value="30">30 guests</option><option value="31">31 guests</option><option value="32">32 guests</option><option value="33">33 guests</option><option value="34">34 guests</option><option value="35">35 guests</option><option value="36">36 guests</option><option value="37">37 guests</option><option value="38">38 guests</option><option value="39">39 guests</option><option value="40">40 guests</option></select></div>
+        <div class="visually-hidden" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+        <div class="field"><label for="message">The occasion, and anything we should know <span class="optional">(optional)</span></label><textarea id="message" name="message" maxlength="2000"></textarea></div>
+        <button class="btn btn-solid btn-block" type="submit"><span>Send enquiry</span></button>
+      </fieldset>
+      <div aria-live="polite" aria-atomic="true" id="status"></div>
+      <p class="reassure">A personal reply within the day, from a person who will remember you.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section reveal" id="login">
+  <p class="eyebrow eyebrow-center">Sign in</p>
+  <h2 class="h2-center">Sign in</h2>
+  <div class="auth-card" style="margin:40px auto 0">
+    <p class="auth-lead">Sign in to follow your enquiries and speed up future bookings.</p>
+    <button class="btn btn-google" type="button" style="margin-top:26px" id="googleBtn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23 12.2c0-.8-.1-1.6-.2-2.3H12v4.5h6.1a5.2 5.2 0 0 1-2.3 3.4v2.8h3.6c2.1-1.9 3.3-4.8 3.3-8.2z"/><path fill="#34A853" d="M12 23.5c3 0 5.5-1 7.3-2.7l-3.6-2.8c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v3A11.5 11.5 0 0 0 12 23.5z"/><path fill="#FBBC05" d="M5.8 14.6a6.9 6.9 0 0 1 0-4.4v-3H2.1a11.5 11.5 0 0 0 0 10.4z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.3 1.7l3.2-3.2A11.5 11.5 0 0 0 2.1 7.2l3.7 3a6.8 6.8 0 0 1 6.2-4.8z"/></svg>
+      <span>Continue with Google</span>
+    </button>
+    <p class="auth-note">Booking.com does not offer guest sign-in for third-party sites. Reservations made there stay in your Booking.com account — use the button below to open them.</p>
+    <div class="auth-divider">or</div>
+    <a class="auth-back" href="#top">Staff sign-in →</a>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer-mark"><svg viewBox="0 0 64 64" width="60" height="60" role="img" aria-label="Citadela"><defs><linearGradient id="g10" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E7CE84"/><stop offset="55%" stop-color="#C9A84C"/><stop offset="100%" stop-color="#9A7E32"/></linearGradient><radialGradient id="w10" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#E7CE84" stop-opacity=".5"/><stop offset="50%" stop-color="#C9A84C" stop-opacity=".12"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></radialGradient></defs>
+<circle cx="32" cy="32" r="24.32" fill="none" stroke="url(#g10)" stroke-width="1.6"/>
+<circle cx="32" cy="32" r="22.19" fill="none" stroke="url(#g10)" stroke-width="0.8"/>
+<path d="M 17.07 39.25 L 17.07 27.31 L 18.77 27.31 L 18.77 25.60 L 20.69 25.60 L 20.69 23.89 L 21.97 23.89 L 21.97 22.61 L 23.25 22.61 L 23.25 21.12 L 24.75 21.12 L 24.75 22.61 L 24.32 22.61 L 24.32 21.12 L 25.81 21.12 L 25.81 22.61 L 25.60 22.61 L 25.60 19.20 L 26.88 19.20 L 26.88 17.07 L 28.37 17.07 L 28.37 15.36 L 29.87 15.36 L 29.87 17.07 L 31.15 17.07 L 31.15 15.79 L 31.47 15.79 L 32.00 11.09 L 32.53 15.79 L 32.85 15.79 L 32.85 17.07 L 34.13 17.07 L 34.13 15.36 L 35.63 15.36 L 35.63 17.07 L 37.12 17.07 L 37.12 19.20 L 38.40 19.20 L 38.40 22.61 L 38.19 22.61 L 38.19 21.12 L 39.68 21.12 L 39.68 22.61 L 39.25 22.61 L 39.25 21.12 L 40.75 21.12 L 40.75 22.61 L 42.03 22.61 L 42.03 23.89 L 43.31 23.89 L 43.31 25.60 L 45.23 25.60 L 45.23 27.31 L 46.93 27.31 L 46.93 39.25 Z" fill="none" stroke="url(#g10)" stroke-width="1.6" stroke-linejoin="round"/>
+<circle cx="32" cy="11.09" r="0.73" fill="url(#g10)"/>
+<path d="M 27.73 42.24 Q 32 43.73 36.27 42.24" fill="none" stroke="url(#g10)" stroke-width="1.12" stroke-linecap="round"/>
+<path d="M 23.47 44.16 Q 32 45.97 40.53 44.16" fill="none" stroke="url(#g10)" stroke-width="1.12" stroke-linecap="round" opacity="0.7"/>
+<path d="M 18.77 46.08 Q 32 48.21 45.23 46.08" fill="none" stroke="url(#g10)" stroke-width="1.12" stroke-linecap="round" opacity="0.45"/>
+<path d="M 13.65 48 Q 32 50.45 50.35 48" fill="none" stroke="url(#g10)" stroke-width="1.12" stroke-linecap="round" opacity="0.25"/></svg></div>
+  <p class="footer-wm">CITADELA</p>
+  <p class="footer-sub">RESORT</p>
+  <p class="footer-meta">Za Humny 262 · 664 34 Rozdrojovice · Rozdrojovice · Brněnská přehrada</p>
+  <p class="footer-meta"><a href="mailto:info@citadelaresort.cz">info@citadelaresort.cz</a> &nbsp;·&nbsp; <a href="tel:+420777130013">+420 777 130 013</a></p>
+  <p class="footer-times"><span>Arrival 16:00</span><span>Departure 10:00</span></p>
+  <p class="footer-signoff">Stay · Ride · Escape</p>
+  <p class="footer-legal">© 2026 Citadela Resort. All rights reserved.</p>
+</footer>
+
+<dialog class="mobile-menu" id="menuDlg" aria-label="Menu">
+  <div class="dialog-head"><p>Menu</p><button class="dialog-close" type="button" data-close>Close</button></div>
+  <div class="dialog-body"><nav aria-label="Menu">
+    <a href="#rooms" data-close>Bedrooms</a>
+    <a href="#wellness" data-close>Wellness</a>
+    <a href="#facilities" data-close>Facilities</a>
+    <a href="#pricing" data-close>Rates</a>
+    <a href="#contact" data-close>Contact</a>
+    <a href="#login" data-close>Sign in</a>
+  </nav></div>
+</dialog>
+
+<dialog id="galDlg" aria-label="Photo gallery">
+  <div class="dialog-head"><p id="galCap"></p>
+    <div class="dialog-actions">
+      <button class="dialog-close" type="button" id="galPrev">Previous</button>
+      <button class="dialog-close" type="button" id="galNext">Next</button>
+      <button class="dialog-close" type="button" data-close>Close</button>
+    </div>
+  </div>
+  <div class="dialog-body">
+    <div class="plate" id="galBody" style="aspect-ratio:16/10"><span class="corner corner-tl"></span><span class="corner corner-tr"></span><span class="corner corner-bl"></span><span class="corner corner-br"></span></div>
+    <p class="dialog-caption" id="galFig"></p>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  var hdr = document.getElementById('hdr');
+  addEventListener('scroll', function () { hdr.dataset.scrolled = String(scrollY > 40); }, { passive: true });
+
+  function wire(dlg) {
+    if ('closedBy' in HTMLDialogElement.prototype) { dlg.setAttribute('closedby', 'any'); }
+    else {
+      dlg.addEventListener('click', function (e) {
+        if (e.target !== dlg) return;
+        var r = dlg.getBoundingClientRect();
+        var inside = r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width;
+        if (!inside) dlg.close();
+      });
+    }
+    dlg.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { dlg.close(); }); });
+  }
+  var menuDlg = document.getElementById('menuDlg'), galDlg = document.getElementById('galDlg');
+  wire(menuDlg); wire(galDlg);
+  document.getElementById('menuBtn').addEventListener('click', function () { menuDlg.showModal(); });
+
+  var gallery = [{"src":"photos/vila-funny-f004-5a04-1081218.jpg","w":1183,"h":720},{"src":"photos/wellness-amp-spa-zona-7dfd-5a05-1081253.jpg","w":1280,"h":853},{"src":"photos/wellness-amp-spa-zona-28b5-5a05-1081247.jpg","w":1280,"h":853},{"src":"photos/stribrny-pokoj-6277-5a05-1081240.jpg","w":1280,"h":853}];
+  var captions = ["Citadela Resort seen from above — the villa, its terrace and the garden, with the hills beyond","The indoor pool, lit turquoise, with loungers and the whirlpool alongside","Inside the Finnish sauna, looking through the glass door to the pool","The Silver Room bathroom, with its corner bath and heated towel rail"];
+  var shown = 0;
+  function render() {
+    var g = gallery[shown];
+    document.getElementById('galCap').textContent =
+      "Image %n of %t"
+        .replace('%n', String(shown + 1)).replace('%t', String(gallery.length));
+    document.getElementById('galBody').innerHTML =
+      '<img src="' + g.src + '" alt="' + captions[shown].replace(/"/g, '&quot;') + '" width="' + g.w + '" height="' + g.h + '">' + "<span class=\"corner corner-tl\"></span><span class=\"corner corner-tr\"></span><span class=\"corner corner-bl\"></span><span class=\"corner corner-br\"></span>";
+    document.getElementById('galFig').textContent = captions[shown];
+  }
+  document.querySelectorAll('.gallery-item').forEach(function (b) {
+    b.addEventListener('click', function () { shown = Number(b.dataset.i); render(); galDlg.showModal(); });
+  });
+  document.getElementById('galPrev').addEventListener('click', function () { shown = (shown - 1 + gallery.length) % gallery.length; render(); });
+  document.getElementById('galNext').addEventListener('click', function () { shown = (shown + 1) % gallery.length; render(); });
+  addEventListener('keydown', function (e) {
+    if (!galDlg.open) return;
+    if (e.key === 'ArrowRight') { shown = (shown + 1) % gallery.length; render(); }
+    if (e.key === 'ArrowLeft') { shown = (shown - 1 + gallery.length) % gallery.length; render(); }
+  });
+
+  // Fallback odhalování pro prohlížeče bez scroll-driven animací (Firefox)
+  if (!CSS.supports('(animation-timeline: view()) and (animation-range: entry)') &&
+      !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.dataset.in = 'true'; io.unobserve(e.target); } });
+    }, { threshold: 0.16 });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  }
+
+  var form = document.getElementById('enq');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var a = form.arrival.value, dep = form.departure.value, err = document.getElementById('dateErr');
+    if (a && dep && new Date(dep) <= new Date(a)) { err.hidden = false; return; }
+    err.hidden = true;
+    if (!form.reportValidity()) return;
+    document.getElementById('status').innerHTML =
+      '<p class="form-status" data-tone="ok">' + "Thank you — a personal reply will follow within the day." +
+      ' <em style="opacity:.75">(' + "not actually sent in the preview" + ')</em></p>';
+  });
+
+  document.getElementById('googleBtn').addEventListener('click', function () {
+    alert("In the real app this starts a genuine Google sign-in (Auth.js). It cannot run in a serverless preview.");
+  });
+})();
+</script>
+</body>
+</html>

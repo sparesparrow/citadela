@@ -1,0 +1,87 @@
+==========================================================================
+A) ŠPIČATÉ ROZDĚLENÍ — dokončení slova uprostřed
+vstup: 'Hlavní město České republiky je Pra'
+tokenů ve vstupu: 17    velikost slovníku: 151936
+
+--- KROK 1 ---   Σp=1.00000000   entropie=2.796 b   perplexita=6.9
+  1. id=2986   'ze'           p=0.429017   42.90%  █████████████████
+  2. id=12176  'ž'            p=0.368380   36.84%  ███████████████
+  3. id=13152  'č'            p=0.047601    4.76%  ██
+  4. id=4360   'za'           p=0.010887    1.09%  
+  5. id=85     'v'            p=0.008500    0.85%  
+  6. id=23815  'zh'           p=0.008096    0.81%  
+  7. id=346    'ce'           p=0.007647    0.76%  
+  8. id=11645  'š'            p=0.007573    0.76%  
+  zbylých 151928 tokenů dohromady: 11.23%
+  → greedy: 'ze'
+
+--- KROK 2 ---   Σp=1.00000000   entropie=7.314 b   perplexita=159.2
+  1. id=11     ','            p=0.136286   13.63%  █████
+  2. id=271    '\n\n'         p=0.058953    5.90%  ██
+  3. id=481    ' -'           p=0.057908    5.79%  ██
+  4. id=13     '.'            p=0.054623    5.46%  ██
+  5. id=320    ' ('           p=0.040848    4.08%  ██
+  6. id=25     ':'            p=0.038827    3.88%  ██
+  7. id=553    ' by'          p=0.037549    3.75%  ██
+  8. id=0      '!'            p=0.031237    3.12%  █
+  zbylých 151928 tokenů dohromady: 54.38%
+  → greedy: ','
+
+==========================================================================
+B) CHAT — faktická otázka
+vstup: '<|im_start|>system\nJsi asistent. Odpovídej česky.<|im_end|>\n<|im_start|>user\nKolik je dva plus dva? Odpověz jedním číslem.<|im_end|>\n<|im_start|>assistant\n'
+tokenů ve vstupu: 50    velikost slovníku: 151936
+
+--- KROK 1 ---   Σp=1.00000000   entropie=5.947 b   perplexita=61.7
+  1. id=42     'K'            p=0.118476   11.85%  █████
+  2. id=35     'D'            p=0.101172   10.12%  ████
+  3. id=46     'O'            p=0.081692    8.17%  ███
+  4. id=41     'J'            p=0.069072    6.91%  ███
+  5. id=29754  'Je'           p=0.068476    6.85%  ███
+  6. id=47     'P'            p=0.049602    4.96%  ██
+  7. id=1249   'To'           p=0.047339    4.73%  ██
+  8. id=32     'A'            p=0.025393    2.54%  █
+  zbylých 151928 tokenů dohromady: 43.88%
+  → greedy: 'K'
+
+--- KROK 2 ---   Σp=1.00000000   entropie=0.385 b   perplexita=1.3
+  1. id=337    'ol'           p=0.972424   97.24%  ███████████████████████████████████████
+  2. id=12913  'oment'        p=0.003544    0.35%  
+  3. id=14225  'oli'          p=0.001719    0.17%  
+  4. id=7637   'lik'          p=0.001584    0.16%  
+  5. id=1263   'ole'          p=0.001575    0.16%  
+  6. id=7762   'olic'         p=0.001032    0.10%  
+  7. id=128910 'lí'           p=0.000848    0.08%  
+  8. id=54048  'olle'         p=0.000467    0.05%  
+  zbylých 151928 tokenů dohromady: 1.68%
+  → greedy: 'ol'
+
+==========================================================================
+C) PLOCHÉ ROZDĚLENÍ — tvůj vlastní fragment
+vstup: '<|im_start|>system\nJsi asistent. Odpovídej česky.<|im_end|>\n<|im_start|>user\nVáha je slovo hw příbuzné hmotnosti. Principu je mít rozdíl váhy.<|im_end|>\n<|im_start|>assistant\n'
+tokenů ve vstupu: 55    velikost slovníku: 151936
+
+--- KROK 1 ---   Σp=1.00000000   entropie=8.448 b   perplexita=349.3
+  1. id=46     'O'            p=0.068355    6.84%  ███
+  2. id=41     'J'            p=0.060999    6.10%  ██
+  3. id=53     'V'            p=0.059918    5.99%  ██
+  4. id=40     'I'            p=0.041022    4.10%  ██
+  5. id=47     'P'            p=0.038536    3.85%  ██
+  6. id=2610   'You'          p=0.024200    2.42%  █
+  7. id=785    'The'          p=0.021109    2.11%  █
+  8. id=51     'T'            p=0.019007    1.90%  █
+  zbylých 151928 tokenů dohromady: 66.69%
+  → greedy: 'O'
+
+--- KROK 2 ---   Σp=1.00000000   entropie=4.750 b   perplexita=26.9
+  1. id=9796   'dp'           p=0.527104   52.71%  █████████████████████
+  2. id=649    'pr'           p=0.047769    4.78%  ██
+  3. id=85     'v'            p=0.023483    2.35%  █
+  4. id=450    'de'           p=0.018848    1.88%  █
+  5. id=983    'to'           p=0.015723    1.57%  █
+  6. id=749    'bo'           p=0.015054    1.51%  █
+  7. id=9325   'ko'           p=0.013228    1.32%  █
+  8. id=548    ' pr'          p=0.013187    1.32%  █
+  zbylých 151928 tokenů dohromady: 32.56%
+  → greedy: 'dp'
+
