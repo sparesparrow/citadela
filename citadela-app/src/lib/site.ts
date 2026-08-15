@@ -284,9 +284,9 @@ export interface RentalItem {
 }
 
 /**
- * ORIENTAČNÍ CENÍK — před spuštěním potvrďte s provozem.
- * Ceny jsou v korunách za kus a den, stejně jako `rates` níže; halíře
- * se používají až ve folio položkách přístupového systému.
+ * Ceny půjčovny potvrzené provozem (2026-08). V korunách za kus a den,
+ * stejně jako `rates` níže; halíře se používají až ve folio položkách
+ * přístupového systému.
  */
 export const rentalItems: RentalItem[] = [
   { slug: "boat", fleet: 1, pricePerDay: 3_500, deposit: 10_000, licence: "vmp", minAge: 18 },

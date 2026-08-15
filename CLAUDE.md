@@ -89,7 +89,8 @@ motorcycles, cars), `rentalPackageList` and the incentives — `stayLengthTiers`
 `groupPricing` for the midweek reduction, invoice terms and the discount cap — all live in
 `site.ts`. Pages and the enquiry form read those lists, so adding a segment or a vehicle is
 one entry there plus its `cs`/`en` dictionary keys; `typecheck` catches a missing translation.
-Fleet prices are marked as indicative in `site.ts` and want confirming with the operator.
+Fleet and package prices in `site.ts` are the operator's confirmed figures — change them there,
+never in a component.
 
 `src/lib/quote.ts` is the arithmetic — nightly rate derived from the week rate, length and
 midweek discounts, per-guest supplement, tourist tax, rental totals and deposits. It is pure
