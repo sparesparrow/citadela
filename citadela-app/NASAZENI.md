@@ -71,6 +71,24 @@ Schéma na produkci **už je nasazené** (`prisma/migrations/20260815000000_init
 
 ## 2. Projekt na Vercelu
 
+### Rychlá cesta
+
+Přihlášení musí udělat člověk, zbytek zvládne skript — naklikat dvanáct
+proměnných bez překlepu je zbytečné riziko:
+
+```bash
+npx vercel login
+cd citadela-app
+ADMIN_EMAIL="vy@example.cz" ADMIN_PASSWORD="…" npx tsx scripts/setup-vercel.ts --deploy
+```
+
+Skript propojí projekt, vytáhne oba připojovací řetězce z Neonu (pooled pro
+aplikaci, přímý pro migrace), vygeneruje `AUTH_SECRET` i `CRON_SECRET`, nasadí
+a nakonec vypíše konkrétní A a CNAME pro Wedos. Je idempotentní, takže se dá
+pustit znovu.
+
+### Nebo ručně
+
 **New Project** → import `sparesparrow/citadela`.
 
 | Nastavení | Hodnota |
