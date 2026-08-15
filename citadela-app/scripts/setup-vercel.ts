@@ -20,7 +20,8 @@ import { randomBytes } from "node:crypto";
 
 const NEON_PROJECT = "shy-hill-84217339";
 const DOMAIN = "citadela-resort.cz";
-const PROJECT = "citadela-resort";
+/** Projekt na Vercelu — ten, ktery je propojeny s GitHubem. */
+const PROJECT = process.env.VERCEL_PROJECT ?? "citadela";
 
 /** Proměnné, které nejsou tajemství a mají pevnou hodnotu. */
 const PLAIN_VARS: Record<string, string> = {
@@ -99,20 +100,22 @@ function main(): void {
 
   // Tajemství se generují tady a nikam se neukládají. Kdo je potřebuje
   // znovu, přečte si je ve Vercelu; do repozitáře nepatří.
-  const admin = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!admin || !adminPassword) {
-    console.error(
-      "\nChybí ADMIN_EMAIL a ADMIN_PASSWORD v prostředí — účet personálu si\n" +
-        "nastavte sám, aby heslo neprošlo přes tenhle skript:\n" +
-        "  ADMIN_EMAIL=vy@example.cz ADMIN_PASSWORD='…' npx tsx scripts/setup-vercel.ts",
-    );
-    process.exit(1);
-  }
   setEnv("AUTH_SECRET", randomBytes(32).toString("base64"));
   setEnv("CRON_SECRET", randomBytes(32).toString("hex"));
-  setEnv("ADMIN_EMAIL", admin);
-  setEnv("ADMIN_PASSWORD", adminPassword);
+
+  // ADMIN_* čte jen seed, ne běžící aplikace — nasazení na nich neblokujeme.
+  // Heslo navíc patří člověku, ne skriptu, takže se nikdy negeneruje samo.
+  const admin = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (admin && adminPassword) {
+    setEnv("ADMIN_EMAIL", admin);
+    setEnv("ADMIN_PASSWORD", adminPassword);
+  } else {
+    console.log(
+      "  --   ADMIN_EMAIL/ADMIN_PASSWORD přeskočeny (čte je jen seed).\n" +
+        "       Účet personálu založíte podle kroku 4 v NASAZENI.md.",
+    );
+  }
 
   if (process.argv.includes("--deploy")) {
     console.log("\nNasazuji…");
