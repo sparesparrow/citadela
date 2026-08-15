@@ -21,25 +21,51 @@ záznamy a Vercel řeší jen web.
 
 ---
 
-## 1. Databáze na Neonu
+## 1. Databáze na Neonu — hotovo
 
-1. Nový projekt, region **Europe (Frankfurt)** — sedí k `fra1` ve `vercel.json`,
-   takže dotazy nechodí přes oceán.
-2. Zkopírujte **pooled** connection string (ten s `-pooler` v hostname).
-   Serverless funkce se škálují po desítkách instancí; přímé spojení by
-   vyčerpalo limit Neonu.
-3. Řetězec musí končit `?sslmode=require`. Když nekončí, aplikace se úmyslně
-   odmítne spustit (`src/lib/prisma.ts`) — lepší chyba při startu než heslo
-   posílané v otevřeném spojení.
+Projekt **`citadela-resort`** (`shy-hill-84217339`), organizace `Citadela`,
+region **AWS eu-central-1 (Frankfurt)** — sedí k `fra1` ve `vercel.json`,
+takže dotazy nechodí přes oceán. Postgres 18.
 
-Výsledek vypadá takto:
+Dvě větve, každá s vlastní databází:
 
+| Větev | Účel | Stav |
+| --- | --- | --- |
+| `production` (výchozí) | ostrá data, čte ji Vercel | migrace nasazená, prázdná |
+| `development` | lokální vývoj | migrace nasazená, naseedovaná |
+
+Rozdělení není kosmetika. `.env` má `SEED_DEMO_ACCESS=1`, a demo seed zakládá
+funkční přístupové údaje ke dveřím. Kdyby lokální `npm run db:seed` mířil na
+produkci, existovaly by platné karty a telefony, které nikomu nepatří.
+
+Kontext projektu je v souboru `.neon` (jen ID, žádná tajemství). Připojovací
+řetězce kdykoli vytáhnete:
+
+```bash
+npx neon connection-string production  --project-id shy-hill-84217339 --pooled
+npx neon connection-string development --project-id shy-hill-84217339 --pooled
 ```
-postgresql://neondb_owner:HESLO@ep-neco-12345-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require
-```
 
-Schéma se vytvoří samo při prvním buildu — `vercel-build` spouští
-`prisma migrate deploy` nad migrací `prisma/migrations/20260815000000_init`.
+### Pooled vs. přímé spojení
+
+Aplikace jede přes **pooled** endpoint (`-pooler` v hostname) — serverless
+funkce se škálují po desítkách instancí a přímé spojení by vyčerpalo limit
+Neonu. **Migrace naopak potřebují přímé spojení**: Neon pouští pooler přes
+PgBouncer v transakčním režimu, kde neprojde advisory zámek, kterým se
+`migrate deploy` brání dvěma souběžným nasazením.
+
+Rozdělení je v `prisma.config.ts` — ten čte jen Prisma CLI a sahá po
+`DATABASE_URL_UNPOOLED`. Běžící aplikace používá adaptér v `src/lib/prisma.ts`
+a `DATABASE_URL`. **Na Vercelu proto musí být obě proměnné**, jinak build
+spadne na migraci.
+
+Řetězec musí obsahovat `sslmode`. Když chybí, aplikace se úmyslně odmítne
+spustit (`src/lib/prisma.ts`) — lepší chyba při startu než heslo posílané
+v otevřeném spojení.
+
+Schéma na produkci **už je nasazené** (`prisma/migrations/20260815000000_init`,
+17 tabulek). Další změny schématu si Vercel dotáhne sám: `vercel-build` spouští
+`prisma migrate deploy` před buildem.
 
 ---
 
@@ -64,7 +90,8 @@ Vložte do **Settings → Environment Variables**, scope **Production**
 
 | Proměnná | Hodnota |
 | --- | --- |
-| `DATABASE_URL` | pooled řetězec z Neonu (krok 1) |
+| `DATABASE_URL` | **pooled** řetězec větve `production` (s `-pooler`) |
+| `DATABASE_URL_UNPOOLED` | **přímý** řetězec téže větve (bez `-pooler`) — jen pro migrace |
 | `AUTH_SECRET` | vygenerujte, viz níže |
 | `AUTH_URL` | `https://citadela-resort.cz` |
 | `AUTH_TRUST_HOST` | `true` |
@@ -160,12 +187,14 @@ citadela-resort.cz.  CAA  0 issue "letsencrypt.org"
 
 ## 4. První spuštění administrace
 
-Migrace proběhly při buildu, ale databáze je prázdná — není v ní účet personálu.
-Ze svého počítače, s produkčním `DATABASE_URL` v prostředí:
+Migrace na produkční větvi proběhly, ale databáze je prázdná — není v ní účet
+personálu. Ze svého počítače, s **produkčním** řetězcem v prostředí (lokální
+`.env` míří na `development`, takže ho musíte přebít):
 
 ```bash
 cd citadela-app
-DATABASE_URL="postgresql://…?sslmode=require" ADMIN_EMAIL="vy@example.cz" ADMIN_PASSWORD="…" npm run db:seed
+DATABASE_URL="$(npx neon connection-string production --project-id shy-hill-84217339 --pooled)" \
+  ADMIN_EMAIL="vy@example.cz" ADMIN_PASSWORD="…" npm run db:seed
 ```
 
 **Bez `SEED_DEMO_ACCESS=1`** — ta proměnná zakládá demo pobyt, čtečky, koloběžky
