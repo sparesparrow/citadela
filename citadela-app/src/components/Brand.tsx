@@ -1,10 +1,17 @@
+"use client";
+
+import { useId } from "react";
+
 /**
  * Značka Citadela — art-deco citadela nad třemi slábnoucími vlnami.
  * Gradienty mají unikátní ID podle instance; v původním jednosouborovém
  * webu se id="f" opakovalo ve všech SVG, což je v jednom dokumentu kolize.
+ *
+ * ID dává `useId()`, ne vlastní čítač. Čítač žije v modulu, takže se na
+ * serveru a v prohlížeči počítá zvlášť — server vyrenderoval `cm1` a klient
+ * při hydrataci `cm2`, což React hlásil jako hydration mismatch. `useId()`
+ * vrací na obou stranách totéž, a proto musí být komponenta klientská.
  */
-let counter = 0;
-
 export function CitadelaMark({
   size = 46,
   ring = true,
@@ -14,7 +21,8 @@ export function CitadelaMark({
   ring?: boolean;
   className?: string;
 }) {
-  const id = `cm${++counter}`;
+  // useId vrací řetězec s dvojtečkami (":r0:"), který v url(#…) neprojde.
+  const id = `cm${useId().replace(/:/g, "")}`;
   return (
     <svg
       viewBox="0 0 64 64"

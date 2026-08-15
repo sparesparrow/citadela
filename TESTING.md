@@ -135,10 +135,16 @@ tomorrow, departure = arrival + 2), submit. Assert:
 
 These are the valuable ones; the happy path rarely breaks alone.
 
+Validation runs in two layers and the error tells you which one fired. Zod checks
+shape and sanity (`guests` must be an integer 1–60) and answers **400** `invalid`;
+the domain rule compares against `site.maxGuests` (40) and answers **422**
+`too_many_guests`. A value above 60 therefore never reaches the domain rule — pick
+one *between* 41 and 60 to exercise it.
+
 | Case | How | Expected |
 |---|---|---|
 | Honeypot | `read_page` to get the `#website` ref (it is `visually-hidden` + `aria-hidden`, **not** `display:none`, so it is still targetable), `form_input` any value, submit | **400** `invalid` |
-| Too many guests | the `<select>` only offers up to `site.maxGuests` (40), so POST directly via `javascript_tool` `fetch` with `guests: 99` | **422** `too_many_guests` |
+| Too many guests | the `<select>` only offers up to `site.maxGuests` (40), so POST directly via `javascript_tool` `fetch` with `guests: 50` | **422** `too_many_guests` |
 | Unavailable | choose dates overlapping the seeded `BlockedDate` — the demo seed blocks 3 days starting 10 days from today, and prints the range | **409** `unavailable` |
 
 ### 3.5 Gallery lightbox (keyboard)

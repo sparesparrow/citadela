@@ -180,8 +180,12 @@ Ve Wedosu: **Domains → citadela-resort.cz → Edit DNS Records**
 
 | Název | Typ | Hodnota | TTL |
 | --- | --- | --- | --- |
-| *(prázdné = apex)* | `A` | IP z karty na Vercelu | 300 |
-| `www` | `CNAME` | hodnota z karty na Vercelu (s tečkou na konci) | 300 |
+| *(prázdné = apex)* | `A` | `76.76.21.21` | 300 |
+| `www` | `A` | `76.76.21.21` | 300 |
+
+Vercel u tohoto projektu chce **A záznam i pro `www`**, ne CNAME — ověřeno
+přes `vercel domains inspect`. Obě jména míří na stejnou adresu, `www` pak
+Vercel sám přesměruje na apex.
 
 Nízké TTL 300 s je záměr pro první dny — kdyby bylo potřeba něco přepnout,
 projeví se to za pět minut, ne za den. Až bude web stát, můžete zvednout na 3600.

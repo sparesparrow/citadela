@@ -1,12 +1,21 @@
+"use client";
+
+import { useId } from "react";
+
 /**
  * Originální zlato-na-černi grafika místo licencovaných fotografií.
  * Každá plocha je navržená tak, aby se dala nahradit skutečným snímkem —
  * stačí předat `photo` a komponenta se odsune.
  */
-let artId = 0;
 
+/**
+ * ID gradientů a masek. Dřív je dával čítač v modulu, jenže ten se na
+ * serveru a v prohlížeči počítá zvlášť — SSR vyrenderovalo `af1` a hydratace
+ * `af9`, takže React celý strom označil za neshodu. `useId()` je na obou
+ * stranách stejné; dvojtečky z něj musí pryč, v `url(#…)` by neprošly.
+ */
 function useIds() {
-  const n = ++artId;
+  const n = useId().replace(/:/g, "");
   return { fill: `af${n}`, glow: `ag${n}`, clip: `ac${n}` };
 }
 
