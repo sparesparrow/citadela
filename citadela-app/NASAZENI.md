@@ -107,7 +107,30 @@ neopisujte z návodů na internetu — CNAME je pro každý projekt jiný
 (typicky `d1d4fc829fe7bc7c.vercel-dns-017.com`) a A záznam se u novějších
 projektů liší (`216.198.79.1` u nových, `76.76.21.21` u starších).
 
-Pak ve Wedosu: **Domains → citadela-resort.cz → Edit DNS Records**
+### Nejdřív uklidit, co v zóně už je
+
+Doména **není prázdná**, i když jste na ni nic nenasadili — apex dnes odpovídá:
+
+```
+citadela-resort.cz.  A  185.8.237.5
+citadela-resort.cz.  A  185.8.237.6
+```
+
+Reverzní záznam obou adres je `protection.wedos.global`, tedy **WEDOS
+Protection** — službu máte na doméně zapnutou (viz *Enabled Add-on Services*
+v detailu domény). Provoz teď prochází jejich proxy na parkovací stránku.
+
+Než přidáte záznam na Vercel, **staré A záznamy smažte**. Kdyby zůstaly,
+DNS je vrátí dohromady s tím novým a prohlížeč si vybere náhodně — dvě
+třetiny návštěvníků by skončily na parkovací stránce a vypadalo by to jako
+náhodný výpadek. Zároveň **vypněte WEDOS Protection** pro tuto doménu
+(nebo ji přepněte do režimu, kdy jen hostuje DNS a neproxuje): Vercel
+potřebuje na doménu vidět přímo, jinak si neověří vlastnictví a nevystaví
+certifikát. Ochranu před útoky přebírá Vercel na své straně.
+
+### Vlastní záznamy
+
+Ve Wedosu: **Domains → citadela-resort.cz → Edit DNS Records**
 (nebo levé menu **DNS citadela-resort.cz → DNS records**) a přidejte:
 
 | Název | Typ | Hodnota | TTL |
@@ -152,6 +175,12 @@ k dveřím, které nikomu nepatří.
 ---
 
 ## 5. Kontrola po nasazení
+
+Nejdřív ověřte, že DNS ukazuje jen na Vercel a nezůstala tam parkovací IP:
+
+```bash
+nslookup -type=A citadela-resort.cz 8.8.8.8    # jedna adresa, ne 185.8.237.x
+```
 
 ```bash
 curl -sI https://citadela-resort.cz/ | head -3          # 307 na /cs nebo /en
