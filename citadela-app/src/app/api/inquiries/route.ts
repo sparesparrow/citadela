@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { expandDates } from "@/lib/booking";
 import { site } from "@/lib/site";
+import { isAvailable } from "@/lib/availability";
 import { UNIT } from "@/lib/booking";
 
 const schema = z.object({
@@ -69,12 +69,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "too_many_guests" }, { status: 422 });
   }
 
-  // Kolize s obsazeností stáhnutou z Booking.com.
-  const wanted = expandDates(arrival, departure);
-  const clash = await prisma.blockedDate.findFirst({
-    where: { roomSlug: UNIT, date: { in: wanted } },
-  });
-  if (clash) {
+  // Kolize s obsazeností — z Booking.comu i z našich potvrzených rezervací.
+  // Dřív se hlídal jen Booking.com, takže se dal tentýž termín prodat
+  // podruhé; viz src/lib/availability.ts.
+  if (!(await isAvailable(arrival, departure))) {
     return NextResponse.json({ error: "unavailable" }, { status: 409 });
   }
 

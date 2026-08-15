@@ -4,10 +4,11 @@ generator client {
 }
 
 datasource db {
-  // Pro produkci zmente na "postgresql" a vymente driver adapter
-  // v src/lib/prisma.ts za @prisma/adapter-pg.
+  // Postgres i ve vyvoji. Ctecky zapisuji soubezne (AccessEvent, UsedNonce)
+  // a SQLite by na produkci zamykala databazi — takze radeji jedno prostredi
+  // pro obe strany nez prekvapeni az po nasazeni.
   // Prisma 7: pripojovaci retezec zije v prisma.config.ts, ne tady.
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 enum Role {

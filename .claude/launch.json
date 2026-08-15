@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "citadela-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "citadela-app", "run", "dev"],
+      "port": 3000,
+      "autoPort": false
+    }
+  ]
+}

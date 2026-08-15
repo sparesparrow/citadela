@@ -1,0 +1,30 @@
+# Lokalni Postgres pro vyvoj. Produkce bezi na Neonu, ale schema i chovani
+# maji byt stejne — proto uz ve vyvoji Postgres, ne SQLite.
+#
+#   docker compose up -d
+#   npm run db:deploy && npm run db:seed
+#
+# Kdo Docker nema, muze misto toho pouzit vyvojovou vetev na Neonu a jen si
+# do .env vlozit jeji connection string.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: citadela-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: citadela
+      POSTGRES_PASSWORD: citadela
+      POSTGRES_DB: citadela
+    ports:
+      - "5432:5432"
+    volumes:
+      - citadela-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U citadela"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  citadela-pgdata:

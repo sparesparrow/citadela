@@ -23,7 +23,7 @@ a jeden kalendář obsazenosti.
 ```bash
 npm install
 cp .env.example .env      # a vyplňte, viz níže
-npm run db:push           # vytvoří SQLite databázi podle schématu
+npm run db:push           # vytvoří schéma v Postgresu (musí běžet)
 npm run db:seed           # založí administrátorský účet
 npm run dev               # http://localhost:3000
 ```
@@ -36,7 +36,7 @@ Kořenová adresa `/` přesměruje na `/cs` nebo `/en` podle jazyka prohlížeč
 
 | Proměnná | Povinná | K čemu |
 |---|---|---|
-| `DATABASE_URL` | ano | Připojení k databázi. Ve vývoji `file:./dev.db`. |
+| `DATABASE_URL` | ano | Připojení k Postgresu. Ve vývoji např. `postgresql://citadela:citadela@localhost:5432/citadela`, na produkci s `?sslmode=require`. |
 | `AUTH_SECRET` | ano | Podpis relací. Vygenerujte `openssl rand -base64 32`. |
 | `AUTH_URL` | v produkci | Veřejná adresa webu, např. `https://citadela.cz`. |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | pro Google login | Z Google Cloud Console. |
@@ -148,12 +148,27 @@ src/app/api/             auth, poptávky, iCal, synchronizace
 
 ---
 
+## Nasazení
+
+Produkce běží na `https://citadela-resort.cz` — Vercel (root directory
+`citadela-app`), Postgres na Neonu, doména a DNS ve Wedosu. Postup krok za
+krokem včetně DNS záznamů a proměnných prostředí je v **[NASAZENI.md](NASAZENI.md)**.
+
+Vercel spouští `vercel-build`, ne `build` — navíc proti němu pouští
+`prisma migrate deploy`. Změna schématu se proto musí odeslat jako migrace
+v `prisma/migrations/`, samotné `db push` se na produkci nedostane.
+
+Naplánované úlohy jsou ve `vercel.json`: synchronizace kalendáře Bookingu
+každou hodinu, mazání záznamů o přístupech ve 3:30. Autorizuje je `CRON_SECRET`,
+který Vercel posílá v hlavičce `Authorization`.
+
+---
+
 ## Než pustíte web ven
 
 - [ ] `ADMIN_PASSWORD` změnit a po seedu z `.env` smazat
 - [ ] `AUTH_SECRET` vygenerovat nový, nepoužívat vývojový
-- [ ] Přepnout na Postgres: v `prisma/schema.prisma` `provider = "postgresql"`,
-      v `src/lib/prisma.ts` vyměnit adaptér za `@prisma/adapter-pg`
+- [x] Postgres i ve vývoji — `provider = "postgresql"`, adaptér `@prisma/adapter-pg`
 - [ ] Doplnit skutečné fotografie — předejte je do `<Gallery photos={…} />`
 - [ ] Nahradit zástupné recenze v `sampleReviews` skutečnými z Booking.com
       a přepnout `reviewsArePublishable` na `true`
@@ -161,6 +176,8 @@ src/app/api/             auth, poptávky, iCal, synchronizace
 - [ ] Rozhodnout rozpory ve zdrojovém textu (viz níž) a srovnat je v `site.ts`
 - [ ] Doplnit odesílání e-mailů (`TODO` v `src/app/api/inquiries/route.ts`)
 - [ ] Nahradit in-memory rate limit Redisem, běží-li víc instancí
+- [x] Retence záznamů o přístupech — `POST /api/cron/retention`,
+      naplánujte stejně jako synchronizaci kalendáře
 - [ ] Doplnit stránky *Ochrana údajů* a *Podmínky* (GDPR)
 - [ ] Cookie lištu, pokud přibude analytika
 
@@ -185,9 +202,17 @@ a ve slovnících.
 ## Ověřeno
 
 - `tsc --noEmit` prochází nad všemi zdrojovými soubory
-- 12 testů logiky Booking.com (`expandDates`, `bookingUrl`, `buildIcal`, `icalTargets`)
+- `npm test` — 85 testů čisté logiky (`npm test`):
+  - Booking.com: `expandDates`, `bookingUrl`, `icalTargets`, `buildIcal`
+    včetně kolečka tam a zpět přes `node-ical`
+  - přístupový systém: rozhodovací pravidla, podpisy Ed25519, přehrání, posun hodin
+  - retence, formátování cen a dat
+- `npm run build` proběhne i bez souboru `.env` (jen s proměnnými prostředí)
+- Regrese přístupového systému proti běžícímu serveru:
+  `npx tsx scripts/ci-reader-check.ts` — 11 kontrol
 - Kontrast barev spočítán proti WCAG 2.1 AA, dvě barvy opraveny
 
-Produkční `next build` v prostředí, kde web vznikal, nebylo možné spustit —
-instalaci balíčku `next` tam nešlo dokončit. Spusťte prosím lokálně
-`npm install && npm run build`.
+Vše výše běží i v CI, viz `.github/workflows/ci.yml`.
+
+**Netestováno:** API routy mimo čtečky, uživatelské rozhraní (postup ručního
+ověření je v `TESTING.md`), přihlášení Googlem a skutečný NFC hardware.

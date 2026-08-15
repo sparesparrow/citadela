@@ -2,9 +2,10 @@ import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { generateKeyPairSync } from "node:crypto";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { bedrooms } from "../src/lib/site";
+import { UNIT, expandDates } from "../src/lib/booking";
 import { generateDeviceKeyPair } from "../src/lib/device-auth";
 import { generateCredentialPublicId } from "../src/lib/credential";
 
@@ -18,7 +19,7 @@ try {
 }
 
 const prisma = new PrismaClient({
-  adapter: new PrismaBetterSqlite3({ url: process.env.DATABASE_URL! }),
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 });
 
 async function main() {
@@ -66,7 +67,26 @@ async function seedAccessDemo() {
 
   const reference = "DEMO-2026-001";
 
-  await prisma.stay.deleteMany({ where: { reference } });
+  // Úklid předchozího demo pobytu.
+  //
+  // `RentalSession` má na hosta i koloběžku vazbu `onDelete: Restrict` —
+  // záměrně, aby účtovaná výpůjčka nešla smazat omylem. Jakmile tedy demo
+  // jednou půjčilo koloběžku (což dělá i regrese v CI), prosté
+  // `stay.deleteMany` narazí na cizí klíč. Musíme proto rozebrat vazby
+  // odspodu: nejdřív výpůjčky, potom položky účtu, teprve pak pobyt.
+  const previous = await prisma.stay.findUnique({
+    where: { reference },
+    select: { id: true, stayGuests: { select: { id: true } } },
+  });
+
+  if (previous) {
+    const guestIds = previous.stayGuests.map((g) => g.id);
+    await prisma.$transaction([
+      prisma.rentalSession.deleteMany({ where: { stayGuestId: { in: guestIds } } }),
+      prisma.folioItem.deleteMany({ where: { stayId: previous.id } }),
+      prisma.stay.delete({ where: { id: previous.id } }),
+    ]);
+  }
 
   const stay = await prisma.stay.create({
     data: {
@@ -201,6 +221,28 @@ async function seedAccessDemo() {
     privateKey: phoneKeys.privateKey.export({ type: "pkcs8", format: "der" }).toString("hex"),
   };
 
+  // --- pevná obsazenost pro testy ------------------------------------------
+  // Bez ní se nedá spolehlivě vyzkoušet, že poptávka na obsazený termín
+  // skončí chybou 409 — skutečná data z Booking.com se mění.
+  const blockedFrom = new Date();
+  blockedFrom.setDate(blockedFrom.getDate() + 10);
+  blockedFrom.setUTCHours(0, 0, 0, 0);
+
+  const blockedDates = expandDates(
+    blockedFrom,
+    new Date(blockedFrom.getTime() + 3 * 86_400_000),
+  );
+
+  await prisma.blockedDate.deleteMany({ where: { source: "qa-fixture" } });
+  await prisma.blockedDate.createMany({
+    data: blockedDates.map((date) => ({
+      roomSlug: UNIT,
+      date,
+      source: "qa-fixture",
+      summary: "Testovací obsazenost",
+    })),
+  });
+
   const target = path.join(process.cwd(), "scripts", ".devices.json");
   writeFileSync(
     target,
@@ -222,6 +264,9 @@ async function seedAccessDemo() {
 
   console.log(`Demo pobyt ${reference}: ${stay.stayGuests.length} hosté, ${Object.keys(devices).length} čteček.`);
   console.log(`Klíče pro simulátor zapsány do scripts/.devices.json`);
+  console.log(
+    `Testovací obsazenost: ${blockedDates.length} dnů od ${blockedFrom.toISOString().slice(0, 10)}`,
+  );
 }
 
 main()

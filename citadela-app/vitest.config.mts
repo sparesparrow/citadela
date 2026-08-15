@@ -11,6 +11,11 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
   },
   resolve: {
-    alias: { "@": path.join(import.meta.dirname, "src") },
+    alias: {
+      "@": path.join(import.meta.dirname, "src"),
+      // `server-only` je jen build-time pojistka Next.js; v node prostredi
+      // neexistuje, takze ji nahradime prazdnym modulem.
+      "server-only": path.join(import.meta.dirname, "src/test/server-only.ts"),
+    },
   },
 });

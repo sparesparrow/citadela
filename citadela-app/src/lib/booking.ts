@@ -68,6 +68,22 @@ export interface ParsedBlock {
   summary: string | null;
 }
 
+/**
+ * Převede datum, jehož *místní* složky nesou zamýšlený kalendářní den,
+ * na půlnoc v UTC.
+ *
+ * node-ical vrací hodnoty `VALUE=DATE` jako místní půlnoc (a značí je
+ * příznakem `dateOnly`), kdežto `expandDates` pracuje s půlnocemi v UTC.
+ * Bez tohoto převodu se v každém pásmu východně od UTC — tedy i v CET/CEST —
+ * celý blok posune o den zpět: obsazenost začne o den dřív a **poslední noc
+ * zůstane volná**, takže poptávkový formulář přijme termín, který se kryje
+ * se skutečnou rezervací z Booking.com. Na serveru běžícím v UTC se chyba
+ * neprojeví, což je přesně důvod, proč dlouho nebyla vidět.
+ */
+export function calendarDayToUtc(value: Date): Date {
+  return new Date(Date.UTC(value.getFullYear(), value.getMonth(), value.getDate()));
+}
+
 /** Vrátí pole půlnocí (UTC) mezi start (včetně) a end (mimo). */
 export function expandDates(start: Date, end: Date): Date[] {
   const out: Date[] = [];
@@ -117,7 +133,8 @@ export async function fetchBlocks(): Promise<ParsedBlock[]> {
     for (const value of Object.values(events)) {
       const ev = value as { type?: string; start?: Date; end?: Date; uid?: string; summary?: string };
       if (ev.type !== "VEVENT" || !ev.start || !ev.end) continue;
-      for (const date of expandDates(ev.start, ev.end)) {
+      // Datum z kalendáře je kalendářní den, ne okamžik — viz calendarDayToUtc.
+      for (const date of expandDates(calendarDayToUtc(ev.start), calendarDayToUtc(ev.end))) {
         blocks.push({
           roomSlug: target.roomSlug,
           date,
@@ -162,6 +179,14 @@ export interface OutboundEvent {
   summary: string;
 }
 
+/**
+ * Doména v UID exportovaných událostí. Schválně konstanta, ne AUTH_URL:
+ * UID musí u téže rezervace zůstat stejné napořád, jinak si ho Booking
+ * napodruhé přečte jako novou událost. Kdyby se bralo z prostředí, lišilo
+ * by se mezi vývojem a produkcí.
+ */
+const ICAL_UID_DOMAIN = "citadela-resort.cz";
+
 export function buildIcal(events: OutboundEvent[], roomSlug?: string): string {
   const now = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   const lines = [
@@ -176,7 +201,7 @@ export function buildIcal(events: OutboundEvent[], roomSlug?: string): string {
   for (const ev of events) {
     lines.push(
       "BEGIN:VEVENT",
-      `UID:${ev.uid}@citadela.cz`,
+      `UID:${ev.uid}@${ICAL_UID_DOMAIN}`,
       `DTSTAMP:${now}`,
       `DTSTART;VALUE=DATE:${icalDate(ev.start)}`,
       `DTEND;VALUE=DATE:${icalDate(ev.end)}`,
