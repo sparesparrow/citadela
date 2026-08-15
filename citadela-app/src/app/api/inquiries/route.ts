@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { site } from "@/lib/site";
+import { site, segments, rentals } from "@/lib/site";
 import { isAvailable } from "@/lib/availability";
 import { UNIT } from "@/lib/booking";
+
+/** Segment poptávky — číselník ze site.ts plus „nic z toho“. */
+const segmentValues = [...segments, "other"] as const;
 
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -13,6 +16,14 @@ const schema = z.object({
   arrival: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   departure: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   guests: z.coerce.number().int().min(1).max(60),
+  segment: z.enum(segmentValues).default("other"),
+  companyName: z.string().trim().max(200).nullish(),
+  // IČO a DIČ přijímáme, jak je host napíše — formáty se liší stát od státu
+  // a odmítnout firemní poptávku kvůli mezeře v DIČ by bylo dražší než opsat ji ručně.
+  companyId: z.string().trim().max(20).nullish(),
+  vatId: z.string().trim().max(20).nullish(),
+  // Zájem o půjčovnu; duplicity odstraníme, ať se nezapisují dvakrát.
+  rentalInterest: z.array(z.enum(rentals)).max(rentals.length * 2).default([]),
   message: z.string().trim().max(2000).nullish(),
   locale: z.enum(["cs", "en"]).default("cs"),
   // Honeypot — roboti vyplní i skryté pole, lidé ne.
@@ -87,6 +98,11 @@ export async function POST(request: Request) {
       departure,
       guests: data.guests,
       roomSlug: UNIT,
+      segment: data.segment,
+      companyName: data.companyName || null,
+      companyId: data.companyId || null,
+      vatId: data.vatId || null,
+      rentalInterest: [...new Set(data.rentalInterest)],
       message: data.message ?? null,
       locale: data.locale,
       userId: session?.user?.id ?? null,

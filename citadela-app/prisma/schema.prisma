@@ -86,12 +86,25 @@ model Inquiry {
   status    InquiryStatus @default(NEW)
   createdAt DateTime      @default(now())
 
+  /// Segment poptavky (SegmentKey ze src/lib/site.ts, nebo "other").
+  /// Slug, ne enum — stejne jako roomSlug; ciselnik zije v site.ts.
+  segment String @default("other")
+
+  /// Fakturacni udaje firemniho zakaznika. Vyplnene jen u firemnich poptavek.
+  companyName String?
+  companyId   String? // ICO
+  vatId       String? // DIC
+
+  /// O jakou techniku z pujcovny ma zajem (RentalKey ze src/lib/site.ts).
+  rentalInterest String[]
+
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   stay Stay?
 
   @@index([status, createdAt])
+  @@index([segment, createdAt])
 }
 
 /// Obsazenost stazena z Booking.com iCal exportu.

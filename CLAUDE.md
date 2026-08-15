@@ -81,6 +81,26 @@ source of truth (bedrooms, amenities, rates, cancellation tiers) — text lives 
 numbers and slugs live here. `BedroomSlug` from `site.ts` is the canonical room identifier
 and is reused as the door↔room mapping in the access system.
 
+### Group segments and the rental fleet
+
+The commercial strategy is data, not prose: `segmentList` (corporate team-building, weddings,
+holidays, school trips, camps), `rentalItems` (boat, paddleboards, scooters, e-bikes,
+motorcycles, cars), `rentalPackageList` and the incentives — `stayLengthTiers`, plus
+`groupPricing` for the midweek reduction, invoice terms and the discount cap — all live in
+`site.ts`. Pages and the enquiry form read those lists, so adding a segment or a vehicle is
+one entry there plus its `cs`/`en` dictionary keys; `typecheck` catches a missing translation.
+Fleet prices are marked as indicative in `site.ts` and want confirming with the operator.
+
+`src/lib/quote.ts` is the arithmetic — nightly rate derived from the week rate, length and
+midweek discounts, per-guest supplement, tourist tax, rental totals and deposits. It is pure
+and unit-tested (`quote.test.ts`); keep new pricing rules there rather than in components.
+Amounts here are whole **CZK**, matching `rates`/`pricing` — halíře belong to the access folio.
+
+An `Inquiry` carries `segment` (a `SegmentKey` slug, or `other`), the billing fields
+`companyName`/`companyId`/`vatId`, and `rentalInterest` (`RentalKey[]`). Slugs, not enums —
+the code list lives in `site.ts`, and `isSegmentKey()` guards reads of older rows whose
+segment no longer exists.
+
 ### Booking.com integration
 
 Booking.com has no usable public API, so `src/lib/booking.ts` does three things:

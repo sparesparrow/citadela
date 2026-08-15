@@ -138,6 +138,46 @@ const paths: Record<string, React.ReactNode> = {
       <path d="M14 9l-3.5 4M6 13l2-3h4" {...s} />
     </>
   ),
+  boat: (
+    <>
+      <path d="M3 17h18l-2.5 4H5.5z" {...s} />
+      <path d="M6 14V9h9l3 5" {...s} />
+      <path d="M9 9V5.5h4" {...s} />
+    </>
+  ),
+  paddleboard: (
+    <>
+      <path d="M2.5 18q4-3.5 9.5-3.5T21.5 18" {...s} />
+      <path d="M13 3.5L8 15" {...s} />
+      <path d="M11.4 3l3 1.2" {...s} />
+      <circle cx="17" cy="7" r="2" {...s} />
+    </>
+  ),
+  bike: (
+    <>
+      <circle cx="5.5" cy="17" r="3.4" {...s} />
+      <circle cx="18.5" cy="17" r="3.4" {...s} />
+      <path d="M5.5 17l4-8h5l4 8" {...s} />
+      <path d="M9 9h6.5M12 17l2.5-8" {...s} />
+    </>
+  ),
+  car: (
+    <>
+      <path d="M3 16v-3l2-5h14l2 5v3" {...s} />
+      <path d="M3 16h18v2.5h-3V16M6 18.5V16H3" {...s} />
+      <path d="M5.5 8.5h13" {...s} />
+      <circle cx="7.5" cy="16" r="1.4" {...s} />
+      <circle cx="16.5" cy="16" r="1.4" {...s} />
+    </>
+  ),
+  motorcycle: (
+    <>
+      <circle cx="5" cy="17" r="3.2" {...s} />
+      <circle cx="19" cy="17" r="3.2" {...s} />
+      <path d="M8.2 17h5.3l-2.5-5h-3" {...s} />
+      <path d="M11 12l4-3h2.5M15.8 9.5L19 17" {...s} />
+    </>
+  ),
 };
 
 export function AmenityIcon({ name, size = 24 }: { name: string; size?: number }) {

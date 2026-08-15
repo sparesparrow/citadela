@@ -8,7 +8,7 @@ Three layers, in order of speed:
 | Layer | Command | Covers |
 |---|---|---|
 | Static | `npm run typecheck` | types, dictionary key parity |
-| Unit | `npm test` | pure logic (`src/lib`) — 85 tests |
+| Unit | `npm test` | pure logic (`src/lib`) — 109 tests |
 | Reader | `npx tsx scripts/ci-reader-check.ts` | signed NFC endpoints — 11 assertions |
 | Browser | this document | UI, forms, auth, responsive |
 
@@ -42,8 +42,8 @@ and `scripts/.devices.json` with the private keys the simulator needs.
 cd citadela-app && npm run typecheck && npm test
 ```
 
-Expected: no `tsc` output, 85 tests passing across five files (access rules, device crypto,
-Booking.com iCal, retention, i18n formatting).
+Expected: no `tsc` output, 109 tests passing across six files (access rules, device crypto,
+Booking.com iCal, retention, i18n formatting, group quote).
 
 Run a single file or a single test:
 
@@ -130,6 +130,22 @@ gallery strip, and section nav are all present. Console errors must be empty.
 tomorrow, departure = arrival + 2), submit. Assert:
 - `get_page_text` contains the success string (`dict.reserve.form.success`), and
 - `read_network_requests({ urlPattern: "/api/inquiries" })` shows **201**.
+
+### 3.3b Group segments, fleet and the company fields
+
+The strategy sections are data-driven from `src/lib/site.ts`, so a missing dictionary key
+shows up as a blank card rather than a type error.
+
+1. On `/cs`, assert the section nav links `#groups` and `#rentals` scroll to real sections,
+   and that `#groups` renders **five** `.segment` cards and `#corporate` four `.mini` cards.
+2. The fleet table under `#rentals` must have one row per entry in `rentalItems` (six),
+   each with a price and either a licence requirement or "Bez průkazu".
+3. In the reserve form, pick **Firemní teambuilding** in `#occasion`. The company fieldset
+   must appear on its own (the checkbox is ticked for you) with `#companyName` required.
+   Untick `invoice` → the fields disappear and their values are *not* sent.
+4. Tick two rentals, submit, then check the POST body in `read_network_requests`:
+   `segment: "corporate"` and `rentalInterest` holding exactly those two slugs.
+5. Repeat on `/en` — both dictionaries must render the same structure.
 
 ### 3.4 Reserve form — the three rejection paths
 

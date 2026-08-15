@@ -61,10 +61,13 @@ export function Header({ nav, closeLabel, locale, bookingHref, isAdmin, isSigned
     document.cookie = `${LOCALE_COOKIE}=${next};path=/;max-age=31536000;samesite=lax`;
   }
 
+  // Skupiny jsou první — vila se pronajímá vcelku, takže je to první otázka,
+  // kterou si návštěvník klade: vejdeme se sem a pro koho to je?
   const sections = [
+    { id: "groups", label: nav.groups },
     { id: "rooms", label: nav.rooms },
     { id: "wellness", label: nav.wellness },
-    { id: "facilities", label: nav.facilities },
+    { id: "rentals", label: nav.rentals },
     { id: "pricing", label: nav.pricing },
     { id: "contact", label: nav.contact },
   ];

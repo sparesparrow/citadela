@@ -175,6 +175,38 @@ export const pricing = {
   cleaningPenalty: 2_000,
 } as const;
 
+/**
+ * Sleva za délku pobytu. Čím delší pobyt, tím méně nástupů a předání —
+ * úklid, praní a přebírání domu stojí stejně u dvou nocí jako u čtrnácti.
+ * Řadí se od nejdelšího pobytu; `stayLengthDiscount()` bere první, které sedí.
+ */
+export const stayLengthTiers = [
+  { minNights: 14, percent: 15 },
+  { minNights: 10, percent: 10 },
+  { minNights: 7, percent: 5 },
+] as const;
+
+/** Podmínky skupinových a firemních pobytů. */
+export const groupPricing = {
+  /** Minimum nocí, od kterého skupinovou nabídku stavíme. */
+  minNights: 2,
+  /** Od kolika osob mluvíme o velké skupině. */
+  largeGroupSize: 25,
+  /**
+   * Sleva na pobyt, který celý proběhne mezi nedělí a čtvrtkem. Pracovní
+   * týden je kapacita, kterou jinak neprodáme; víkendy se plní samy.
+   */
+  midweekPercent: 15,
+  /** Splatnost firemní faktury ve dnech od vystavení. */
+  invoiceDueDays: 14,
+  /** Firemní záloha v procentech — nižší než u soukromých hostů, proti objednávce. */
+  corporateAdvancePercent: 30,
+  /** Do kolika hodin posíláme cenovou nabídku na firemní poptávku. */
+  quoteWithinHours: 24,
+  /** Strop pro součet slev — pod tuto hranici dům neprodáváme. */
+  maxDiscountPercent: 25,
+} as const;
+
 /** Storno podmínky — dny před nástupem a podíl z ceny. */
 export const cancellationTiers = [
   { withinDays: 91, percent: 10 },
@@ -184,11 +216,119 @@ export const cancellationTiers = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Segmenty — kdo dům bere
+// ---------------------------------------------------------------------------
+
+/**
+ * Vila se pronajímá vcelku, takže se vyplatí jen velká společnost na delší
+ * dobu. Segmenty popisují, komu tu nabídku adresujeme; pořadí je zároveň
+ * pořadím na webu — firemní pobyty jsou první, protože platí za celý dům
+ * i mimo sezónu a mimo víkend, což je jediná kapacita, která nám leží ladem.
+ */
+export const segments = ["corporate", "wedding", "holiday", "school", "camp"] as const;
+export type SegmentKey = (typeof segments)[number];
+
+export interface Segment {
+  slug: SegmentKey;
+  /** Od kolika osob nabídku stavíme. */
+  minGuests: number;
+  /** Doporučená délka pobytu v nocích. */
+  minNights: number;
+  /** Půjčovna, kterou k segmentu nabízíme jako první. */
+  rentals: RentalKey[];
+  /** Zvýrazněný segment na webu. */
+  featured?: boolean;
+}
+
+export const segmentList: Segment[] = [
+  {
+    slug: "corporate",
+    minGuests: 15,
+    minNights: 2,
+    rentals: ["boat", "paddleboard", "scooter", "bike"],
+    featured: true,
+  },
+  { slug: "wedding", minGuests: 20, minNights: 2, rentals: ["boat", "car"] },
+  { slug: "holiday", minGuests: 10, minNights: 6, rentals: ["paddleboard", "bike", "motorcycle"] },
+  { slug: "school", minGuests: 20, minNights: 3, rentals: ["paddleboard", "bike"] },
+  { slug: "camp", minGuests: 25, minNights: 6, rentals: ["boat", "paddleboard", "bike"] },
+];
+
+/** Segmenty, které vozí i nedospělé účastníky — potřebují dohodu navíc. */
+export const supervisedSegments: SegmentKey[] = ["school", "camp"];
+
+/** Poptávky nesou segment jako slug, takže se hodí ověřit, že ho ještě známe. */
+export function isSegmentKey(value: string): value is SegmentKey {
+  return (segments as readonly string[]).includes(value);
+}
+
+// ---------------------------------------------------------------------------
 // Půjčovna
 // ---------------------------------------------------------------------------
 
-export const rentals = ["scooter", "chopper"] as const;
+export const rentals = ["boat", "paddleboard", "scooter", "bike", "motorcycle", "car"] as const;
 export type RentalKey = (typeof rentals)[number];
+
+export interface RentalItem {
+  slug: RentalKey;
+  /** Kolik kusů máme k dispozici. */
+  fleet: number;
+  /** Cena za kus a den. */
+  pricePerDay: number;
+  /** Vratná kauce za kus; u drobné techniky ji nebereme. */
+  deposit?: number;
+  /** Skupina řidičského oprávnění, nebo `vmp` pro vůdce malého plavidla. */
+  licence?: "A" | "B" | "vmp";
+  /** Minimální věk řidiče. */
+  minAge?: number;
+}
+
+/**
+ * ORIENTAČNÍ CENÍK — před spuštěním potvrďte s provozem.
+ * Ceny jsou v korunách za kus a den, stejně jako `rates` níže; halíře
+ * se používají až ve folio položkách přístupového systému.
+ */
+export const rentalItems: RentalItem[] = [
+  { slug: "boat", fleet: 1, pricePerDay: 3_500, deposit: 10_000, licence: "vmp", minAge: 18 },
+  { slug: "paddleboard", fleet: 6, pricePerDay: 450 },
+  { slug: "scooter", fleet: 8, pricePerDay: 390 },
+  { slug: "bike", fleet: 6, pricePerDay: 590 },
+  { slug: "motorcycle", fleet: 2, pricePerDay: 1_900, deposit: 15_000, licence: "A", minAge: 21 },
+  { slug: "car", fleet: 2, pricePerDay: 1_500, deposit: 10_000, licence: "B", minAge: 21 },
+];
+
+export const rentalBySlug: Record<RentalKey, RentalItem> = Object.fromEntries(
+  rentalItems.map((item) => [item.slug, item]),
+) as Record<RentalKey, RentalItem>;
+
+/**
+ * Programové balíčky — půjčovna poskládaná do půldne nebo dne, s cenou
+ * za osobu. Firmy nekupují kusy techniky, kupují hotový program, který
+ * si nemusí nikdo z nich organizovat.
+ */
+export const rentalPackages = ["water", "ride", "grandTour"] as const;
+export type RentalPackageKey = (typeof rentalPackages)[number];
+
+export interface RentalPackage {
+  slug: RentalPackageKey;
+  /** Cena za osobu. */
+  perPerson: number;
+  minGuests: number;
+  hours: number;
+  includes: RentalKey[];
+}
+
+export const rentalPackageList: RentalPackage[] = [
+  { slug: "water", perPerson: 690, minGuests: 10, hours: 4, includes: ["boat", "paddleboard"] },
+  { slug: "ride", perPerson: 590, minGuests: 10, hours: 4, includes: ["scooter", "bike"] },
+  {
+    slug: "grandTour",
+    perPerson: 1_290,
+    minGuests: 15,
+    hours: 8,
+    includes: ["boat", "paddleboard", "scooter", "bike"],
+  },
+];
 
 // ---------------------------------------------------------------------------
 // Okolí
@@ -232,7 +372,7 @@ export const bedroomPhotos: Partial<Record<BedroomSlug, Photo>> = {
   silver: photos.bathroom,
 };
 
-export const sectionIds = ["rooms", "wellness", "facilities", "pricing", "contact"] as const;
+export const sectionIds = ["groups", "rooms", "wellness", "facilities", "rentals", "pricing", "contact"] as const;
 export type SectionId = (typeof sectionIds)[number];
 
 /**

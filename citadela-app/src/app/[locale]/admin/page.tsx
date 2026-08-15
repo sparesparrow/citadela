@@ -4,6 +4,8 @@ import { requireAdmin } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, isLocale, formatDate, type Locale } from "@/lib/i18n";
 import { icalTargets } from "@/lib/booking";
+import { isSegmentKey, type RentalKey } from "@/lib/site";
+import type { Dictionary } from "@/dictionaries/en";
 import { SyncPanel } from "@/components/SyncPanel";
 import { SignOutButton } from "@/components/AuthForms";
 
@@ -12,6 +14,22 @@ export const dynamic = "force-dynamic";
 
 function nightsBetween(a: Date, b: Date): number {
   return Math.max(1, Math.round((b.getTime() - a.getTime()) / 86_400_000));
+}
+
+/**
+ * Segment i technika se v poptávce ukládají jako slug. Číselník žije v site.ts
+ * a může se změnit dřív než staré záznamy, proto se neznámý slug jen vypíše,
+ * ne aby kvůli němu spadl výpis poptávek.
+ */
+function segmentLabel(slug: string, dict: Dictionary): string {
+  if (isSegmentKey(slug)) return dict.groups.items[slug].name;
+  if (slug === "other") return dict.reserve.form.occasionOther;
+  return dict.admin.inquiries.noSegment;
+}
+
+function rentalLabel(slug: string, dict: Dictionary): string {
+  const items = dict.rentals.items as Record<string, { name: string } | undefined>;
+  return items[slug]?.name ?? slug;
 }
 
 export default async function AdminPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -27,9 +45,10 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
 
   const dict = await getDictionary(locale);
 
-  const [newCount, totalCount, blockedCount, lastSync, inquiries] = await Promise.all([
+  const [newCount, totalCount, corporateCount, blockedCount, lastSync, inquiries] = await Promise.all([
     prisma.inquiry.count({ where: { status: "NEW" } }),
     prisma.inquiry.count(),
+    prisma.inquiry.count({ where: { segment: "corporate" } }),
     prisma.blockedDate.count(),
     prisma.syncLog.findFirst({ where: { ok: true }, orderBy: { startedAt: "desc" } }),
     prisma.inquiry.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
@@ -67,6 +86,10 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
           <dd>{totalCount}</dd>
         </div>
         <div className="stat">
+          <dt>{dict.admin.stats.corporateInquiries}</dt>
+          <dd>{corporateCount}</dd>
+        </div>
+        <div className="stat">
           <dt>{dict.admin.stats.blockedDates}</dt>
           <dd>{blockedCount}</dd>
         </div>
@@ -97,6 +120,7 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                   <th scope="col">{dict.admin.inquiries.guest}</th>
                   <th scope="col">{dict.admin.inquiries.dates}</th>
                   <th scope="col">{dict.admin.inquiries.guests}</th>
+                  <th scope="col">{dict.admin.inquiries.occasion}</th>
                   <th scope="col">{dict.admin.inquiries.received}</th>
                   <th scope="col">{dict.admin.inquiries.status}</th>
                 </tr>
@@ -121,6 +145,35 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                       </span>
                     </td>
                     <td>{inq.guests}</td>
+                    <td>
+                      {segmentLabel(inq.segment, dict)}
+                      {inq.companyName && (
+                        <>
+                          <br />
+                          <strong style={{ color: "var(--cream)" }}>{inq.companyName}</strong>
+                        </>
+                      )}
+                      {inq.companyId && (
+                        <>
+                          <br />
+                          <span className="small">
+                            {dict.admin.inquiries.companyId} {inq.companyId}
+                            {inq.vatId ? ` · ${dict.admin.inquiries.vatId} ${inq.vatId}` : ""}
+                          </span>
+                        </>
+                      )}
+                      {inq.rentalInterest.length > 0 && (
+                        <>
+                          <br />
+                          <span style={{ color: "var(--gold-lo)" }}>
+                            {dict.admin.inquiries.wantsRentals}:{" "}
+                            {inq.rentalInterest
+                              .map((slug: RentalKey | string) => rentalLabel(slug, dict))
+                              .join(", ")}
+                          </span>
+                        </>
+                      )}
+                    </td>
                     <td>{formatDate(inq.createdAt, locale)}</td>
                     <td>
                       <span className="pill" data-status={inq.status}>

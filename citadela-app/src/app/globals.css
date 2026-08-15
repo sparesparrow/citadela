@@ -660,6 +660,35 @@ legend { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; col
 .field-error { display: block; margin-top: 7px; font-size: 12.5px; color: #e8907f; letter-spacing: 0.04em; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
+/* vnořené skupiny polí — fakturace a půjčovna */
+.subfields { border: 0; border-top: 1px solid var(--line); padding-top: 22px; margin-block-end: 22px; }
+.subfields legend {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding-inline-end: 12px;
+}
+.subfields .reserve-note { margin-top: 0; margin-bottom: 18px; }
+.check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px 20px; }
+.check {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--cream-dim);
+  font-size: 14px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.check:hover { color: var(--cream); }
+
 .form-status { margin-top: 18px; padding: 15px 18px; border: 1px solid var(--line-strong); font-size: 14.5px; }
 .form-status[data-tone="ok"] { border-color: var(--gold); color: var(--gold-hi); background: rgba(201, 168, 76, 0.08); }
 .form-status[data-tone="error"] { border-color: #a8503f; color: #e8907f; background: rgba(168, 80, 63, 0.08); }
@@ -1019,6 +1048,72 @@ dialog::backdrop { background: rgba(6, 6, 6, 0.86); backdrop-filter: blur(6px); 
   color: var(--gold-hi);
   font-size: 16px;
 }
+
+/* segmenty — komu je dům určený */
+.segments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 22px;
+  margin-top: 46px;
+}
+.segment {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line-strong);
+  padding: 30px 26px;
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.04), transparent);
+  transition: border-color 0.45s, translate 0.45s var(--ease);
+}
+.segment:hover { border-color: var(--gold); translate: 0 -4px; }
+.segment-featured {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.12), transparent 70%);
+}
+.segment h3 { font-style: italic; font-size: 23px; color: var(--gold-hi); }
+.segment-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-lo);
+}
+.segment > p { color: var(--cream-dim); font-size: 15px; margin-top: 16px; }
+.segment-rentals-label {
+  margin-top: 22px;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.segment-rentals { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.segment-rentals li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  border: 1px solid var(--line);
+  padding: 6px 11px;
+}
+.segment-rentals svg { width: 16px; height: 16px; flex: none; color: var(--gold); }
+/* karta segmentu roste, seznam techniky drží u spodní hrany */
+.segment .segment-rentals { margin-top: auto; padding-top: 12px; }
+
+/* flotila půjčovny */
+.fleet-table { border: 1px solid var(--line-strong); margin-top: 26px; }
+.fleet-name { display: flex; align-items: center; gap: 10px; color: var(--cream); }
+.fleet-name svg { flex: none; color: var(--gold); }
+.rate .segment-rentals { margin-top: 20px; }
+
+/* skupinové slevy v ceníku */
+.group-rates { margin-top: 56px; }
+.group-rates .lead { margin-top: 10px; }
+.group-rates .terms { margin-top: 20px; max-width: 62ch; }
 
 /* podmínky a storno */
 .terms-grid {

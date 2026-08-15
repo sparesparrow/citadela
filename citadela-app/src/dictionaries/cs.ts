@@ -9,9 +9,11 @@ export const cs: Dictionary = {
     otherLocaleLabel: "English",
   },
   nav: {
+    groups: "Skupiny",
     rooms: "Ložnice",
     wellness: "Wellness",
     facilities: "Vybavení",
+    rentals: "Půjčovna",
     pricing: "Ceník",
     contact: "Kontakt",
     reserve: "Poptat",
@@ -168,21 +170,133 @@ export const cs: Dictionary = {
       adultsOriented: "Zařízeno pro dospělé hosty",
     },
   },
-  rentals: {
-    eyebrow: "Po okolí",
-    heading: "Objevujte v tichu. Nenechte za sebou nic.",
-    lead: "Elektrické koloběžky si na dobu pobytu odemknete přes aplikaci, chopper zapůjčíme na vyžádání. Objeďte břeh dřív, než se den probudí, sledujte šotolinové cesty, na které mapy zapomněly, a vraťte se, až vám to řekne světlo.",
+  groups: {
+    eyebrow: "Kdo si dům bere",
+    heading: "Postavený pro skupinu, oceněný pro tu, která zůstane déle.",
+    lead: "Vila se pronajímá jen vcelku, takže dává smysl společnosti dost velké na to, aby ji zaplnila, a pobytu dost dlouhému, aby se v ní stihla usadit. Vracejí se nám k tomu pětery hosté; každý má svoje podmínky a každému umíme mít loď, paddleboardy i kola připravené hned u brány.",
+    minGuests: (n: number) => `od ${n} osob`,
+    // Po předložce „od“ je genitiv, takže „nocí“ pro všechny počty nad jedna.
+    minNights: (n: number) => (n === 1 ? "od 1 noci" : `od ${n} nocí`),
+    rentalsLabel: "Nejčastěji si k tomu berou",
     items: {
-      scooter: {
-        name: "Elektrické koloběžky",
-        body: "Odemknete si je v aplikaci, kolik jich vaše společnost potřebuje, na celou dobu pobytu.",
+      corporate: {
+        name: "Firemní teambuilding",
+        body: "Celý tým na jedné adrese: osm ložnic, čtyři společenské prostory, wellness a zahrada, na kterou nikdo cizí nevkročí. Dny na vodě nebo na dvou kolech, večery u ohniště a porada, která se stane sama, protože jsou stejně všichni v jedné místnosti.",
       },
-      chopper: {
-        name: "Chopper",
-        body: "Na vyžádání — napište nám to do poptávky a budeme ho mít připravený.",
+      wedding: {
+        name: "Svatby a oslavy",
+        body: "Svatebčané spí tam, kde slaví. Taneční parket, ozvučení vyvedené až na terasu, otočná jehla na celé sele a žádná recepce, která by večer zavřela. Vezměte si dům od pátku a nikdo nemusí odjíždět domů.",
+      },
+      holiday: {
+        name: "Dovolená větší party",
+        body: "Dvě tři rodiny nebo parta přátel, která se nechce rozdělit do apartmánů. Bazén drží 29 °C celoročně, břeh je tři sta metrů pod domem a druhý týden jde cena za noc dolů s vámi.",
+      },
+      school: {
+        name: "Školní výlety a kurzy",
+        body: "Uzavřený oplocený areál, celá skupina pod jednou střechou, plně vybavená kuchyně a dost společenského prostoru, aby se kurz dal doopravdy odučit. Domlouváme se předem se školou, rozdělení po pokojích včetně.",
+      },
+      camp: {
+        name: "Soustředění a tábory",
+        body: "Týden a víc s vodou za humny: lodě a paddleboardy z vlastní flotily, lesní cesty rovnou od brány a večery, které zůstanou v areálu. Nejdelší pobyty mají největší slevu.",
       },
     },
-    note: "Půjčovna se účtuje zvlášť od pobytu.",
+    supervisedNote:
+      "Dům je zařízený pro dospělé hosty. Školní skupiny a tábory bereme po předchozí dohodě, se jmenovaným dozorem a s wellness provozovaným podle dohodnutého rozvrhu.",
+    cta: "Poptat skupinovou nabídku",
+  },
+  corporate: {
+    eyebrow: "Pro firmy",
+    heading: "Teambuilding, který projde účtárnou.",
+    lead: "Teambuilding v Citadele se kupuje jako cokoli jiného: písemná nabídka, faktura s vaším IČO a jeden dodavatel na dům, catering i program. Přijede vám hotový program, ne hromada rezervací, které někdo musí obvolat.",
+    points: [
+      {
+        title: "Jedna faktura, ne jedenáct",
+        body: "Ubytování, program i půjčovna jdou na jeden daňový doklad vystavený na firmu. Zaměstnanci na místě neplatí nic a nikdo pak nesbírá účtenky.",
+      },
+      {
+        title: "Nabídka dřív, než se zavážete",
+        body: "Pošlete termín a počet lidí a vrátí se vám písemná nabídka rozepsaná na noc, osobu a aktivitu — tak, aby šla beze změn poslat ke schválení.",
+      },
+      {
+        title: "Pracovní týden vyjde levněji",
+        body: "Víkendy se naplní samy, neděle až čtvrtek ne. Uspořádejte akci uprostřed týdne a pobyt je o to levnější, dům máte pořád jen pro sebe.",
+      },
+      {
+        title: "Program si vezmeme na starost",
+        body: "Lodě, paddleboardy, koloběžky i kola jsou naše a čekají u brány. Kuchař uvaří přímo v domě, nebo přiveze catering. Váš tým jenom přijede a zúčastní se.",
+      },
+    ],
+    termsHeading: "Jak to chodí papírově",
+    terms: {
+      invoice: (days: number) => `Fakturujeme firmě se splatností ${days} dní od vystavení.`,
+      identifiers: "Na fakturu potřebujeme název firmy, IČO a DIČ.",
+      advance: (percent: number) => `Termín potvrzuje záloha ${percent} % proti objednávce.`,
+      quote: (hours: number) => `Písemnou nabídku posíláme do ${hours} hodin od poptávky.`,
+      minimum: (nights: number, guests: number) =>
+        `Skupinové podmínky platí od ${nights} nocí a ${guests} osob.`,
+      changes: "Počet osob se dá bez poplatku upravit do 14 dní před nástupem.",
+    },
+    cta: "Vyžádat firemní nabídku",
+  },
+  rentals: {
+    eyebrow: "Flotila",
+    heading: "Přehrada, les i silnice — všechno rovnou od brány.",
+    lead: "Loď na přehradě, prkna na ploché ranní vodě, koloběžky a elektrokola podél břehu a auto nebo motorka na den, kdy se někdo bude chtít dostat dál. Všechno je naše, všechno čeká na místě a nic se nemusí vyzvedávat ve městě.",
+    items: {
+      boat: {
+        name: "Motorový člun",
+        body: "Po přehradě s celou partou na palubě, nebo tahá toho, kdo se chce nechat táhnout. Když nikdo nemá průkaz, jede s vámi náš kapitán.",
+      },
+      paddleboard: {
+        name: "Paddleboardy",
+        body: "Šest prken s pádly a vestami, k vodě tři sta metrů pod domem. Nejplošší hladina je před osmou.",
+      },
+      scooter: {
+        name: "Elektrické koloběžky",
+        body: "Odemknete si je v aplikaci, kolik jich vaše společnost potřebuje, na celou dobu pobytu. Přes noc se nabíjejí v garáži.",
+      },
+      bike: {
+        name: "Elektrokola",
+        body: "Na cesty podél břehu a na stoupání k hradu Veveří, které je s motorem pod sebou úplně jiná vyjížďka.",
+      },
+      motorcycle: {
+        name: "Motorky",
+        body: "Chopper a cestovní stroj na silnice nad přehradou. Proti řidičskému průkazu a kauci.",
+      },
+      car: {
+        name: "Auta",
+        body: "Dvě auta na místě — na skok do Brna, na odvoz na letiště nebo na nákup, se kterým nikdo nepočítal. Palivo se doúčtuje podle spotřeby.",
+      },
+    },
+    fleetHeading: "Flotila a denní sazby",
+    columns: { item: "Technika", fleet: "K dispozici", perDay: "Za den", deposit: "Kauce", licence: "Podmínky" },
+    licences: {
+      A: "Řidičský průkaz skupiny A",
+      B: "Řidičský průkaz skupiny B",
+      vmp: "Průkaz VMP, nebo náš kapitán",
+      none: "Bez průkazu",
+    },
+    minAge: (n: number) => `od ${n} let`,
+    noDeposit: "—",
+    packagesHeading: "Programy na den",
+    packagesLead: "Pro skupiny, které si program nechtějí skládat samy: technika, instruktáž i trasa, cena za osobu.",
+    packages: {
+      water: {
+        name: "Na vodě",
+        body: "Loď a prkna pro celou skupinu na střídačku, po celou dobu s naším člověkem na břehu.",
+      },
+      ride: {
+        name: "Na kolech",
+        body: "Koloběžky a elektrokola, trasa podél přehrady a zastávka tam, kde se dá naobědvat.",
+      },
+      grandTour: {
+        name: "Celý den",
+        body: "Dopoledne voda, odpoledne kola a ohniště zapálené, než se vrátíte. Stavěné pro týmy od patnácti lidí.",
+      },
+    },
+    packageMeta: (hours: number, minGuests: number) => `${hours} hodin · od ${minGuests} osob`,
+    perPerson: "za osobu",
+    note: "Půjčovna i programy se účtují zvlášť od pobytu a můžou jít na tutéž firemní fakturu. Kauce je vratná, vracíme ji v den odjezdu.",
   },
   pricing: {
     eyebrow: "Ceník",
@@ -192,6 +306,16 @@ export const cs: Dictionary = {
     nights: (n: number) => (n === 1 ? "1 noc" : n < 5 ? `${n} noci` : `${n} nocí`),
     includedGuests: (n: number) => `cena zahrnuje ${n} osob`,
     extraGuest: (amount: string) => `${amount} za každou další osobu a noc`,
+    group: {
+      heading: "Čím déle zůstanete, tím levnější je noc",
+      lead: "Mimo pevné balíčky se dům počítá po nocích a skupina, která zůstane, za ně platí méně. Slevy se vztahují na ubytování i na příplatek za osoby a sčítají se.",
+      nightlyFrom: (amount: string) => `${amount} za noc za celý objekt`,
+      stayLengthRow: (nights: number, percent: number) => `${percent} % sleva od ${nights} nocí`,
+      midweekRow: (percent: number) => `${percent} % sleva, když všechny noci padnou mezi neděli a čtvrtek`,
+      maxRow: (percent: number) => `Slevy se sčítají, nejvýše však do ${percent} %.`,
+      quoteNote:
+        "Pošlete termín a počet osob a přesné číslo se vrátí písemně — tabulka výše je to, z čeho se skládá.",
+    },
     rates: {
       week: { name: "Týden", note: "Kterákoli sezóna · od neděle do neděle" },
       christmas: { name: "Vánoce", note: "Pevný termín" },
@@ -271,6 +395,17 @@ export const cs: Dictionary = {
       phoneOptional: "nepovinné",
       guests: "Počet osob",
       guestsOption: (n: number) => (n === 1 ? "1 osoba" : n < 5 ? `${n} osoby` : `${n} osob`),
+      occasion: "S čím k nám jedete",
+      occasionOther: "Něco jiného",
+      invoiceToggle: "Chci fakturovat na firmu",
+      companyLegend: "Firemní údaje",
+      companyHint: "Ať můžeme správně vystavit nabídku i fakturu.",
+      companyName: "Firma",
+      companyId: "IČO",
+      vatId: "DIČ",
+      optional: "nepovinné",
+      rentalsLegend: "Co byste si chtěli půjčit",
+      rentalsHint: "Jen abychom to podrželi — nic se neúčtuje, dokud se nedomluvíme.",
       message: "Příležitost a cokoli, co bychom měli vědět",
       messageOptional: "nepovinné",
       submit: "Odeslat poptávku",
@@ -312,6 +447,7 @@ export const cs: Dictionary = {
     stats: {
       newInquiries: "Nové poptávky",
       totalInquiries: "Poptávek celkem",
+      corporateInquiries: "Firemních poptávek",
       blockedDates: "Blokovaných dní",
       lastSync: "Poslední synchronizace",
       never: "nikdy",
@@ -332,8 +468,13 @@ export const cs: Dictionary = {
       guest: "Host",
       dates: "Termín",
       guests: "Osob",
+      occasion: "Příležitost",
       received: "Přijato",
       status: "Stav",
+      noSegment: "neuvedeno",
+      companyId: "IČO",
+      vatId: "DIČ",
+      wantsRentals: "Půjčovna",
       nights: (n: number) => (n === 1 ? "1 noc" : n < 5 ? `${n} noci` : `${n} nocí`),
       statuses: { NEW: "Nová", CONTACTED: "Kontaktováno", CONFIRMED: "Potvrzeno", DECLINED: "Zamítnuto" },
     },

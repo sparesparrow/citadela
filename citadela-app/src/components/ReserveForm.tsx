@@ -20,11 +20,23 @@ export type ReserveFormLabels = Omit<
   tooManyGuests: string;
 };
 
+/** Volba do výběru nebo zaškrtávátka; popisky vyhodnotil server. */
+export interface FormOption {
+  value: string;
+  label: string;
+}
+
 interface Props {
   labels: ReserveFormLabels;
   locale: "cs" | "en";
   /** Kapacita celého objektu — vila se pronajímá vcelku. */
   maxGuests: number;
+  /** Segmenty pobytu (site.ts) plus volba „něco jiného“. */
+  occasions: FormOption[];
+  /** Technika z půjčovny, kterou si host může předběžně podržet. */
+  rentalOptions: FormOption[];
+  /** Segment, u kterého předpokládáme fakturaci na firmu. */
+  invoiceSegment: string;
   signedInEmail?: string | null;
   signedInName?: string | null;
 }
@@ -35,10 +47,23 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function ReserveForm({ labels, locale, maxGuests, signedInEmail, signedInName }: Props) {
+export function ReserveForm({
+  labels,
+  locale,
+  maxGuests,
+  occasions,
+  rentalOptions,
+  invoiceSegment,
+  signedInEmail,
+  signedInName,
+}: Props) {
   const f = labels;
   const [arrival, setArrival] = useState("");
   const [departure, setDeparture] = useState("");
+  const [occasion, setOccasion] = useState("");
+  // Firemní pobyt se fakturuje skoro vždy, ostatní jen někdy — proto se
+  // pole odkrývají zaškrtávátkem, ne podle segmentu.
+  const [invoice, setInvoice] = useState(false);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<Status>(null);
   const [dateError, setDateError] = useState<string | null>(null);
@@ -76,6 +101,13 @@ export function ReserveForm({ labels, locale, maxGuests, signedInEmail, signedIn
           arrival: a,
           departure: d,
           guests: Number(data.get("guests") ?? 2),
+          segment: occasion || "other",
+          // Fakturační údaje posíláme jen tehdy, když je host odkryl —
+          // jinak by v databázi zůstaly zbytky po přepnutí zaškrtávátka.
+          companyName: invoice ? data.get("companyName") || null : null,
+          companyId: invoice ? data.get("companyId") || null : null,
+          vatId: invoice ? data.get("vatId") || null : null,
+          rentalInterest: data.getAll("rentalInterest").map(String),
           message: data.get("message") || null,
           website: data.get("website") || undefined,
           locale,
@@ -95,6 +127,8 @@ export function ReserveForm({ labels, locale, maxGuests, signedInEmail, signedIn
         form.reset();
         setArrival("");
         setDeparture("");
+        setOccasion("");
+        setInvoice(false);
       }
     } catch {
       setStatus({ tone: "error", text: f.error });
@@ -189,6 +223,83 @@ export function ReserveForm({ labels, locale, maxGuests, signedInEmail, signedIn
             ))}
           </select>
         </div>
+
+        <div className="field">
+          <label htmlFor="occasion">{f.occasion}</label>
+          <select
+            id="occasion"
+            name="occasion"
+            value={occasion}
+            onChange={(e) => {
+              setOccasion(e.target.value);
+              // Firemní teambuilding rovnou počítá s fakturou; host ji
+              // může odškrtnout, ostatní segmenty si ji zaškrtnou samy.
+              if (e.target.value === invoiceSegment) setInvoice(true);
+            }}
+          >
+            <option value="">—</option>
+            {occasions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="field">
+          <label className="check">
+            <input
+              type="checkbox"
+              name="invoice"
+              checked={invoice}
+              onChange={(e) => setInvoice(e.target.checked)}
+            />
+            <span>{f.invoiceToggle}</span>
+          </label>
+        </div>
+
+        {invoice && (
+          <fieldset className="subfields">
+            <legend>{f.companyLegend}</legend>
+            <p className="reserve-note">{f.companyHint}</p>
+            <div className="field">
+              <label htmlFor="companyName">{f.companyName}</label>
+              <input
+                id="companyName"
+                name="companyName"
+                type="text"
+                required
+                maxLength={200}
+                autoComplete="organization"
+              />
+            </div>
+            <div className="row2">
+              <div className="field">
+                <label htmlFor="companyId">{f.companyId}</label>
+                <input id="companyId" name="companyId" type="text" maxLength={20} inputMode="numeric" />
+              </div>
+              <div className="field">
+                <label htmlFor="vatId">
+                  {f.vatId} <span className="optional">({f.optional})</span>
+                </label>
+                <input id="vatId" name="vatId" type="text" maxLength={20} />
+              </div>
+            </div>
+          </fieldset>
+        )}
+
+        <fieldset className="subfields">
+          <legend>{f.rentalsLegend}</legend>
+          <p className="reserve-note">{f.rentalsHint}</p>
+          <div className="check-grid">
+            {rentalOptions.map((option) => (
+              <label className="check" key={option.value}>
+                <input type="checkbox" name="rentalInterest" value={option.value} />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         {/* Honeypot — skrytý před lidmi, roboti ho vyplní. Server takové
             odeslání odmítne. Není to display:none, aby ho čtečky ignorovaly

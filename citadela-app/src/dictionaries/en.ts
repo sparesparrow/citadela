@@ -11,9 +11,11 @@ export const en = {
     otherLocaleLabel: "Čeština",
   },
   nav: {
+    groups: "Groups",
     rooms: "Bedrooms",
     wellness: "Wellness",
     facilities: "Facilities",
+    rentals: "Rentals",
     pricing: "Rates",
     contact: "Contact",
     reserve: "Enquire",
@@ -170,21 +172,127 @@ export const en = {
       adultsOriented: "Arranged for adult guests",
     },
   },
-  rentals: {
-    eyebrow: "Getting around",
-    heading: "Explore in silence. Leave nothing behind.",
-    lead: "Electric scooters can be unlocked through an app for the length of your stay, and a chopper is available on request. Trace the shoreline before the day wakes, follow the gravel paths the maps forget, and come back whenever the light tells you to.",
+  groups: {
+    eyebrow: "Who takes the house",
+    heading: "Built for a group, priced for a long one.",
+    lead: "The villa is only ever let whole, so it makes sense for parties large enough to fill it and long enough to settle in. Five kinds of group come back to us; each has its own arrangement, and each can have the boats, boards and bikes waiting at the gate.",
+    minGuests: (n: number) => `from ${n} guests`,
+    minNights: (n: number) => (n === 1 ? "from 1 night" : `from ${n} nights`),
+    rentalsLabel: "Usually taken with",
     items: {
-      scooter: {
-        name: "Electric scooters",
-        body: "Unlocked from an app, as many as your group needs, for as long as you are here.",
+      corporate: {
+        name: "Company team-building",
+        body: "One address for the whole team: eight bedrooms, four social spaces, a wellness floor and a garden nobody else walks into. Days on the water or on two wheels, evenings around the fire pit, and a meeting that happens simply because everyone is already in the same room.",
       },
-      chopper: {
-        name: "Chopper",
-        body: "Available on request — ask when you enquire and we will have it waiting.",
+      wedding: {
+        name: "Weddings & celebrations",
+        body: "The wedding party sleeps where it celebrates. A dance floor, sound wired through to the terrace, a spit big enough for a whole hog, and no reception desk closing the evening down. Take the house from Friday and nobody has to drive home.",
+      },
+      holiday: {
+        name: "Holidays for larger parties",
+        body: "Two or three families, or a group of friends who would rather not split across apartments. The pool holds 29 °C all year, the shore is three hundred metres down, and by the second week the price per night has come down with you.",
+      },
+      school: {
+        name: "School trips & courses",
+        body: "A closed, fenced site with the whole group under one roof, a full kitchen, and enough social space for a course to actually run. Arranged with the school in advance, with sleeping arrangements agreed room by room.",
+      },
+      camp: {
+        name: "Camps & training weeks",
+        body: "A week or more with the water on the doorstep: boats and boards from our own fleet, forest paths straight from the gate, and evenings that stay inside the grounds. The longest stays carry the largest reduction.",
       },
     },
-    note: "Rentals are charged separately from the stay.",
+    supervisedNote:
+      "The house is furnished for adult guests. School groups and camps are welcome by prior arrangement, with named supervisors and the wellness floor used to an agreed timetable.",
+    cta: "Ask for a group offer",
+  },
+  corporate: {
+    eyebrow: "For companies",
+    heading: "An away-day your finance department can file.",
+    lead: "Team-building at Citadela is bought the way a company buys anything else: a written quote, an invoice with your registration number on it, and one supplier for the house, the catering and the activities. What arrives is a programme, not a pile of bookings to arrange.",
+    points: [
+      {
+        title: "One invoice, not eleven",
+        body: "Accommodation, activities and rentals go on a single tax document made out to your company. No employee pays anything on the day and no one collects receipts afterwards.",
+      },
+      {
+        title: "A quote before you commit",
+        body: "Send the dates and the headcount and a written offer follows, with the price broken down per night, per person and per activity, so it can go through approval unchanged.",
+      },
+      {
+        title: "The working week costs less",
+        body: "Weekends fill themselves; Sunday to Thursday does not. Hold your away-day midweek and the stay is cheaper for it, with the whole house still yours alone.",
+      },
+      {
+        title: "The programme is ours to run",
+        body: "Boats, paddleboards, scooters and bikes come from our own fleet and are ready at the gate. A chef can cook in the house, or a caterer delivers. Your team turns up and takes part.",
+      },
+    ],
+    termsHeading: "How the paperwork works",
+    terms: {
+      invoice: (days: number) => `Invoiced to the company, payable within ${days} days of issue.`,
+      identifiers: "We need the company name, registration number and VAT number for the invoice.",
+      advance: (percent: number) => `A ${percent}% deposit against a purchase order confirms the dates.`,
+      quote: (hours: number) => `A written quote follows within ${hours} hours of your enquiry.`,
+      minimum: (nights: number, guests: number) =>
+        `Group arrangements start at ${nights} nights and ${guests} guests.`,
+      changes: "The headcount can be adjusted up to 14 days before arrival at no charge.",
+    },
+    cta: "Request a company quote",
+  },
+  rentals: {
+    eyebrow: "The fleet",
+    heading: "The lake, the forest and the road — all of it from the gate.",
+    lead: "A boat on the reservoir, boards on flat morning water, scooters and electric bikes for the shoreline, and a car or a motorcycle for the day someone wants to go further. Everything is ours, everything is waiting when you arrive, and nothing has to be collected from town.",
+    items: {
+      boat: {
+        name: "Motorboat",
+        body: "On the reservoir with the whole group aboard, or towing whoever wants to be towed. Skippered by us if nobody in the party holds a licence.",
+      },
+      paddleboard: {
+        name: "Paddleboards",
+        body: "Six boards with paddles and vests, carried down to the shore three hundred metres below the house. The water is flattest before eight.",
+      },
+      scooter: {
+        name: "Electric scooters",
+        body: "Unlocked from an app, as many as your group needs, for as long as you are here. Charged in the garage overnight.",
+      },
+      bike: {
+        name: "Electric bikes",
+        body: "For the shoreline trails and the climb to Veveří Castle, which is a very different ride with a motor under you.",
+      },
+      motorcycle: {
+        name: "Motorcycles",
+        body: "A chopper and a touring machine, for the roads above the reservoir. Licence and deposit required.",
+      },
+      car: {
+        name: "Cars",
+        body: "Two cars on site for the run into Brno, the airport transfer, or the shop nobody planned for. Fuel is charged as used.",
+      },
+    },
+    fleetHeading: "Fleet and daily rates",
+    columns: { item: "Item", fleet: "Available", perDay: "Per day", deposit: "Deposit", licence: "Requirements" },
+    licences: { A: "Category A licence", B: "Category B licence", vmp: "Boat licence or our skipper", none: "No licence needed" },
+    minAge: (n: number) => `from ${n} years`,
+    noDeposit: "—",
+    packagesHeading: "Programmes by the day",
+    packagesLead: "For groups that would rather not put a programme together themselves: equipment, instruction and the route, priced per person.",
+    packages: {
+      water: {
+        name: "On the water",
+        body: "Boat and boards for the whole group, in shifts, with someone of ours on the shore the entire time.",
+      },
+      ride: {
+        name: "On wheels",
+        body: "Scooters and electric bikes, a route along the reservoir, and a stop somewhere that serves lunch.",
+      },
+      grandTour: {
+        name: "The whole day",
+        body: "Water in the morning, wheels in the afternoon, the fire pit lit by the time you come back. Built for teams of fifteen and up.",
+      },
+    },
+    packageMeta: (hours: number, minGuests: number) => `${hours} hours · from ${minGuests} people`,
+    perPerson: "per person",
+    note: "Rentals and programmes are charged separately from the stay and can go on the same company invoice. Deposits are refundable and returned on the day of departure.",
   },
   pricing: {
     eyebrow: "Rates",
@@ -194,6 +302,15 @@ export const en = {
     nights: (n: number) => (n === 1 ? "1 night" : `${n} nights`),
     includedGuests: (n: number) => `price includes ${n} guests`,
     extraGuest: (amount: string) => `${amount} per additional guest, per night`,
+    group: {
+      heading: "The longer you stay, the less each night costs",
+      lead: "Outside the fixed packages the house is priced by the night, and a group that stays on pays less for it. Reductions apply to the accommodation and the per-guest supplement, and they combine.",
+      nightlyFrom: (amount: string) => `${amount} per night for the whole villa`,
+      stayLengthRow: (nights: number, percent: number) => `${percent}% off from ${nights} nights`,
+      midweekRow: (percent: number) => `${percent}% off when every night falls between Sunday and Thursday`,
+      maxRow: (percent: number) => `Reductions combine, up to a maximum of ${percent}%.`,
+      quoteNote: "Send your dates and headcount and the exact figure comes back in writing — the table above is what it is built from.",
+    },
     rates: {
       week: { name: "Week", note: "Any season · Sunday to Sunday" },
       christmas: { name: "Christmas", note: "Fixed period" },
@@ -273,6 +390,17 @@ export const en = {
       phoneOptional: "optional",
       guests: "Guests",
       guestsOption: (n: number) => (n === 1 ? "1 guest" : `${n} guests`),
+      occasion: "What brings you",
+      occasionOther: "Something else",
+      invoiceToggle: "Invoice this to a company",
+      companyLegend: "Company details",
+      companyHint: "So the quote and the invoice can be made out correctly.",
+      companyName: "Company",
+      companyId: "Registration number",
+      vatId: "VAT number",
+      optional: "optional",
+      rentalsLegend: "Rentals you would want",
+      rentalsHint: "Only so we can hold them — nothing is charged until it is agreed.",
       message: "The occasion, and anything we should know",
       messageOptional: "optional",
       submit: "Send enquiry",
@@ -314,6 +442,7 @@ export const en = {
     stats: {
       newInquiries: "New enquiries",
       totalInquiries: "Enquiries in total",
+      corporateInquiries: "Company enquiries",
       blockedDates: "Days blocked",
       lastSync: "Last sync",
       never: "never",
@@ -334,8 +463,13 @@ export const en = {
       guest: "Guest",
       dates: "Dates",
       guests: "Guests",
+      occasion: "Occasion",
       received: "Received",
       status: "Status",
+      noSegment: "unstated",
+      companyId: "Reg. no.",
+      vatId: "VAT no.",
+      wantsRentals: "Rentals",
       nights: (n: number) => (n === 1 ? "1 night" : `${n} nights`),
       statuses: { NEW: "New", CONTACTED: "Contacted", CONFIRMED: "Confirmed", DECLINED: "Declined" },
     },

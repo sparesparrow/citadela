@@ -12,7 +12,12 @@ import {
   rates,
   pricing,
   cancellationTiers,
+  stayLengthTiers,
+  groupPricing,
+  segmentList,
   rentals,
+  rentalItems,
+  rentalPackageList,
   nearbyDining,
   bookingScore,
   sampleReviews,
@@ -21,6 +26,7 @@ import {
   galleryPhotos,
   bedroomPhotos,
 } from "@/lib/site";
+import { nightlyRate, packagePrice } from "@/lib/quote";
 import { AmenityIcon, CheckIcon } from "@/components/Icons";
 import { CitadelaMark } from "@/components/Brand";
 import { ScooterPlate, RoomPlate } from "@/components/Art";
@@ -47,6 +53,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     guestsOptions: Array.from({ length: site.maxGuests }, (_, i) => guestsOption(i + 1)),
     tooManyGuests: tooManyGuests(site.maxGuests),
   };
+
+  // Číselníky do formuláře — hodnoty jsou slugy ze site.ts, popisky ze slovníku.
+  const occasions = [
+    ...segmentList.map((segment) => ({ value: segment.slug, label: dict.groups.items[segment.slug].name })),
+    { value: "other", label: dict.reserve.form.occasionOther },
+  ];
+  const rentalOptions = rentals.map((key) => ({ value: key, label: dict.rentals.items[key].name }));
 
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${site.geo.lng - 0.02}%2C${
     site.geo.lat - 0.012
@@ -126,9 +139,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* ---------------- STICKY SEKČNÍ NAVIGACE ---------------- */}
       <nav className="subnav" aria-label={dict.nav.menu}>
         <div className="subnav-inner">
+          <a href="#groups">{dict.nav.groups}</a>
           <a href="#rooms">{dict.nav.rooms}</a>
           <a href="#wellness">{dict.nav.wellness}</a>
           <a href="#facilities">{dict.nav.facilities}</a>
+          <a href="#rentals">{dict.nav.rentals}</a>
           <a href="#pricing">{dict.nav.pricing}</a>
           <a href="#contact">{dict.nav.contact}</a>
         </div>
@@ -197,6 +212,80 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <p>{item.body}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        {/* ---------------- SKUPINY ---------------- */}
+        <section className="section reveal" id="groups">
+          <p className="eyebrow">{dict.groups.eyebrow}</p>
+          <h2>{dict.groups.heading}</h2>
+          <p className="lead">{dict.groups.lead}</p>
+
+          <div className="segments">
+            {segmentList.map((segment) => {
+              const text = dict.groups.items[segment.slug];
+              return (
+                <article
+                  className={`segment${segment.featured ? " segment-featured" : ""}`}
+                  key={segment.slug}
+                >
+                  <h3>{text.name}</h3>
+                  <p className="segment-facts">
+                    <span>{dict.groups.minGuests(segment.minGuests)}</span>
+                    <span>{dict.groups.minNights(segment.minNights)}</span>
+                  </p>
+                  <p>{text.body}</p>
+                  <p className="segment-rentals-label">{dict.groups.rentalsLabel}</p>
+                  <ul className="segment-rentals">
+                    {segment.rentals.map((key) => (
+                      <li key={key}>
+                        <AmenityIcon name={key} size={16} />
+                        <span>{dict.rentals.items[key].name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
+          </div>
+
+          <p className="fine-note">{dict.groups.supervisedNote}</p>
+          <a className="btn" href="#contact" style={{ marginTop: 28 }}>
+            <span>{dict.groups.cta}</span>
+          </a>
+        </section>
+
+        {/* ---------------- FIRMY ---------------- */}
+        <section className="section reveal" id="corporate">
+          <p className="eyebrow">{dict.corporate.eyebrow}</p>
+          <h2>{dict.corporate.heading}</h2>
+          <p className="lead">{dict.corporate.lead}</p>
+
+          <div className="terms-grid">
+            <div className="mini-grid">
+              {dict.corporate.points.map((point) => (
+                <div className="mini" key={point.title}>
+                  <h3>{point.title}</h3>
+                  <p>{point.body}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <h3 className="terms-heading">{dict.corporate.termsHeading}</h3>
+              <ul className="terms">
+                <li>{dict.corporate.terms.quote(groupPricing.quoteWithinHours)}</li>
+                <li>{dict.corporate.terms.invoice(groupPricing.invoiceDueDays)}</li>
+                <li>{dict.corporate.terms.identifiers}</li>
+                <li>{dict.corporate.terms.advance(groupPricing.corporateAdvancePercent)}</li>
+                <li>
+                  {dict.corporate.terms.minimum(groupPricing.minNights, segmentList[0].minGuests)}
+                </li>
+                <li>{dict.corporate.terms.changes}</li>
+              </ul>
+              <a className="btn btn-solid" href="#contact" style={{ marginTop: 28 }}>
+                <span>{dict.corporate.cta}</span>
+              </a>
+            </div>
           </div>
         </section>
 
@@ -294,7 +383,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </section>
 
         {/* ---------------- PŮJČOVNA ---------------- */}
-        <section className="section section-tight">
+        <section className="section section-tight" id="rentals">
           <div className="feature reveal">
             <div className="feature-copy">
               <p className="eyebrow">{dict.rentals.eyebrow}</p>
@@ -309,7 +398,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   </div>
                 ))}
               </div>
-              <p className="fine-note">{dict.rentals.note}</p>
             </div>
             <div className="plate">
               <ScooterPlate />
@@ -319,6 +407,73 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <span className="corner corner-br" />
             </div>
           </div>
+        </section>
+
+        {/* ---------------- FLOTILA A BALÍČKY ---------------- */}
+        <section className="section reveal">
+          <h3 className="terms-heading">{dict.rentals.fleetHeading}</h3>
+          <div className="table-wrap fleet-table">
+            <table>
+              <caption className="visually-hidden">{dict.rentals.fleetHeading}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{dict.rentals.columns.item}</th>
+                  <th scope="col">{dict.rentals.columns.fleet}</th>
+                  <th scope="col">{dict.rentals.columns.perDay}</th>
+                  <th scope="col">{dict.rentals.columns.deposit}</th>
+                  <th scope="col">{dict.rentals.columns.licence}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rentalItems.map((item) => (
+                  <tr key={item.slug}>
+                    <td>
+                      <span className="fleet-name">
+                        <AmenityIcon name={item.slug} size={18} />
+                        {dict.rentals.items[item.slug].name}
+                      </span>
+                    </td>
+                    <td className="num">{item.fleet}</td>
+                    <td className="num">{money(item.pricePerDay)}</td>
+                    <td className="num">{item.deposit ? money(item.deposit) : dict.rentals.noDeposit}</td>
+                    <td>
+                      {item.licence ? dict.rentals.licences[item.licence] : dict.rentals.licences.none}
+                      {item.minAge ? ` · ${dict.rentals.minAge(item.minAge)}` : ""}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="terms-heading" style={{ marginTop: 52 }}>
+            {dict.rentals.packagesHeading}
+          </h3>
+          <p className="lead">{dict.rentals.packagesLead}</p>
+          <div className="rate-grid">
+            {rentalPackageList.map((pack) => (
+              <article className="rate" key={pack.slug}>
+                <h3>{dict.rentals.packages[pack.slug].name}</h3>
+                <p className="rate-note">{dict.rentals.packageMeta(pack.hours, pack.minGuests)}</p>
+                <p className="rate-price">{money(pack.perPerson)}</p>
+                <p className="rate-meta">{dict.rentals.perPerson}</p>
+                <p className="rate-meta">
+                  {/* Cena za nejmensi skupinu, aby bylo videt, s cim se pocita. */}
+                  {money(packagePrice(pack.perPerson, pack.minGuests, pack.minGuests))} ·{" "}
+                  {dict.groups.minGuests(pack.minGuests)}
+                </p>
+                <ul className="segment-rentals">
+                  {pack.includes.map((key) => (
+                    <li key={key}>
+                      <AmenityIcon name={key} size={16} />
+                      <span>{dict.rentals.items[key].name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+          <p className="fine-note">{dict.rentals.note}</p>
         </section>
 
         {/* ---------------- CENÍK ---------------- */}
@@ -344,6 +499,27 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {dict.pricing.includedGuests(pricing.includedGuests)} ·{" "}
             {dict.pricing.extraGuest(money(pricing.extraGuestPerNight))}
           </p>
+
+          {/* Skupinové slevy — hlavní argument pro delší a mimovíkendové pobyty.
+              Pásma se vypisují vzestupně, jak je host čte; v site.ts jsou
+              sestupně, protože se v nich hledá první vyhovující. */}
+          <div className="group-rates">
+            <h3 className="terms-heading">{dict.pricing.group.heading}</h3>
+            <p className="lead">{dict.pricing.group.lead}</p>
+            <p className="rate-caption">{dict.pricing.group.nightlyFrom(money(nightlyRate()))}</p>
+            <ul className="terms">
+              {[...stayLengthTiers]
+                .sort((a, b) => a.minNights - b.minNights)
+                .map((tier) => (
+                  <li key={tier.minNights}>
+                    {dict.pricing.group.stayLengthRow(tier.minNights, tier.percent)}
+                  </li>
+                ))}
+              <li>{dict.pricing.group.midweekRow(groupPricing.midweekPercent)}</li>
+              <li>{dict.pricing.group.maxRow(groupPricing.maxDiscountPercent)}</li>
+            </ul>
+            <p className="fine-note">{dict.pricing.group.quoteNote}</p>
+          </div>
 
           <div className="terms-grid">
             <div>
@@ -507,6 +683,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               labels={reserveLabels}
               locale={locale}
               maxGuests={site.maxGuests}
+              occasions={occasions}
+              rentalOptions={rentalOptions}
+              invoiceSegment="corporate"
               signedInEmail={session?.user?.email ?? null}
               signedInName={session?.user?.name ?? null}
             />
