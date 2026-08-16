@@ -3,16 +3,17 @@
 How to verify Citadela Resort — written so **Claude Code can execute it directly** using the
 integrated Chrome browser (`mcp__Claude_Browser__*`), without improvising.
 
-Three layers, in order of speed:
+Five layers, in order of speed:
 
 | Layer | Command | Covers |
 |---|---|---|
 | Static | `npm run typecheck` | types, dictionary key parity |
-| Unit | `npm test` | pure logic (`src/lib`) — 121 tests |
+| Unit | `npm test` | pure logic (`src/lib`) — 123 tests |
 | Reader | `npx tsx scripts/ci-reader-check.ts` | signed NFC endpoints — 11 assertions |
-| Browser | this document | UI, forms, auth, responsive |
+| E2E | `npm run e2e` | pages, enquiry form, rental terms, admin — 32 Cypress tests |
+| Browser | this document | look, responsive, keyboard — what a runner can't judge |
 
-The first three run automatically in CI on every push and pull request
+The first four run automatically in CI on every push and pull request
 (`.github/workflows/ci.yml`). Only the browser layer needs a human — or Claude.
 
 > **Nepouštějte `npm run build`, dokud běží `npm run dev`.** Build přepíše `.next` pod
@@ -32,7 +33,8 @@ cd citadela-app && rm -f prisma/dev.db && npm run db:push && SEED_DEMO_ACCESS=1 
 That produces: the admin account from `.env`, stay `DEMO-2026-001` (CHECKED_IN, guests
 *Jana Nováková*/gold and *Petr Novák*/silver), 8 bedroom door readers plus `door-entrance`,
 `door-wellness`, `dock-garage`, scooters `SC-01`/`SC-02`, one CARD and one PHONE credential,
-and `scripts/.devices.json` with the private keys the simulator needs.
+`scripts/.devices.json` with the private keys the simulator needs, and three demo enquiries
+(corporate with billing details, a school trip in supervised mode, and a private stay).
 
 ---
 
@@ -42,7 +44,7 @@ and `scripts/.devices.json` with the private keys the simulator needs.
 cd citadela-app && npm run typecheck && npm test
 ```
 
-Expected: no `tsc` output, 121 tests passing across seven files (access rules, device crypto,
+Expected: no `tsc` output, 123 tests passing across seven files (access rules, device crypto,
 Booking.com iCal, retention, i18n formatting, group quote, offer code lists).
 
 Run a single file or a single test:
@@ -90,6 +92,29 @@ cd citadela-app && npx tsx scripts/simulate-reader.ts door-gold card
 
 The last four are the ones that matter most: replay, skew, double-rental, and idempotent
 return. Set `SIMULATE_BASE_URL` if the dev server took a port other than 3000.
+
+---
+
+## 2b. E2E layer (Cypress)
+
+Needs a running server **and** the demo seed — the admin specs assert against the
+seeded enquiries, and the enquiry specs submit more than the rate limiter allows:
+
+```bash
+cd citadela-app
+SEED_DEMO_ACCESS=1 npm run db:seed
+INQUIRY_RATE_LIMIT_MAX=500 npm start &
+npm run e2e                 # headless; npm run e2e:open for the UI
+```
+
+Four specs, 32 tests: `home` (sections, fleet table, Booking.com deep link),
+`inquiry` (company fields, supervised mode, what the POST body actually carries),
+`rental-terms` (draft banner, per-item requirements) and `admin` (staff login,
+the enquiry rows). On a headless box run it under `xvfb-run -a npx cypress run`.
+
+`INQUIRY_RATE_LIMIT_MAX` exists for exactly this: the limiter defaults to 5 per
+10 minutes and would otherwise 429 the suite halfway through. Never set it in
+production.
 
 ---
 

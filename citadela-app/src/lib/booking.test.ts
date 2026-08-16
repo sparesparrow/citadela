@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   UNIT,
+  bookingHotelId,
   bookingReviewsUrl,
   bookingUrl,
   buildIcal,
@@ -80,9 +81,26 @@ describe("bookingUrl", () => {
     expect(url.searchParams.get("aid")).toBe("1234567");
   });
 
+  it("bez slugu miri odkaz na ID objektu", () => {
+    vi.stubEnv("BOOKING_HOTEL_PATH", "");
+    const url = new URL(bookingUrl());
+    expect(url.pathname).toBe("/searchresults.html");
+    expect(url.searchParams.get("dest_id")).toBe(bookingHotelId());
+    expect(url.searchParams.get("dest_type")).toBe("hotel");
+  });
+
+  it("ID objektu jde prepsat z prostredi", () => {
+    vi.stubEnv("BOOKING_HOTEL_PATH", "");
+    vi.stubEnv("BOOKING_HOTEL_ID", "999");
+    expect(new URL(bookingUrl()).searchParams.get("dest_id")).toBe("999");
+  });
+
   it("respektuje BOOKING_HOTEL_PATH", () => {
     vi.stubEnv("BOOKING_HOTEL_PATH", "cz/jiny-objekt");
-    expect(bookingUrl()).toContain("/hotel/cz/jiny-objekt.html");
+    const url = new URL(bookingUrl());
+    expect(url.toString()).toContain("/hotel/cz/jiny-objekt.html");
+    // Na strance objektu uz ID neni k cemu — slug sam o sobe staci.
+    expect(url.searchParams.has("dest_id")).toBe(false);
   });
 
   it("data prevede na YYYY-MM-DD", () => {

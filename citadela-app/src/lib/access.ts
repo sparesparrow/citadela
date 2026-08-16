@@ -6,7 +6,7 @@
  * zarizeni a zapis auditu, tenhle soubor resi *jestli* se ma otevrit.
  */
 
-import { site } from "./site";
+import { site, rentalTerms } from "./site";
 import type { BedroomSlug } from "./site";
 
 // ---------------------------------------------------------------------------
@@ -170,9 +170,10 @@ function decideScooterDock(input: AuthorizeInput): Decision {
 
 /**
  * Aktualni verze podminek pujcovny. Zaznamena se ke kazde vypujcce,
- * aby slo pozdeji dolozit, s cim host souhlasil.
+ * aby slo pozdeji dolozit, s cim host souhlasil. Bere se z rentalTerms
+ * v site.ts — verze u zapujcky musi odkazovat na dokument, ktery existuje.
  */
-export const RENTAL_TERMS_VERSION = "2026-08-01";
+export const RENTAL_TERMS_VERSION = rentalTerms.version;
 
 export interface RentalPricing {
   baseFeeCents: number;

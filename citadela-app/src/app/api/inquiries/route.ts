@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { site, segments, rentals, houseModeFor } from "@/lib/site";
 import { isAvailable } from "@/lib/availability";
 import { UNIT } from "@/lib/booking";
+import { nightsBetween } from "@/lib/quote";
+import { sendMail } from "@/lib/mail";
 
 /** Segment poptávky — číselník ze site.ts plus „nic z toho“. */
 const segmentValues = [...segments, "other"] as const;
@@ -31,10 +33,56 @@ const schema = z.object({
   website: z.string().max(0).optional(),
 });
 
+type InquiryPayload = z.infer<typeof schema>;
+
+/** Předmět nese segment, ať jde firemní poptávka poznat ve schránce na první pohled. */
+function inquiryNotificationSubject(segment: InquiryPayload["segment"], name: string): string {
+  return `Poptávka (${segment}): ${name}`;
+}
+
+/**
+ * Interní upozornění pro provoz — prostý text, protože se čte na telefonu
+ * a jediné, co má udělat, je dát dost údajů pro odpověď bez otevírání správy.
+ */
+function inquiryNotificationBody(
+  input: InquiryPayload & { id: string; nights: number },
+): string {
+  const lines = [
+    `Segment: ${input.segment} (režim: ${houseModeFor(input.segment)})`,
+    `Termín: ${input.arrival} → ${input.departure} (${input.nights} nocí)`,
+    `Osob: ${input.guests}`,
+  ];
+
+  if (houseModeFor(input.segment) === "supervised") {
+    lines.push(`Dozor: ${input.supervisorCount ?? "neuveden"}`);
+  }
+  if (input.companyName) {
+    lines.push(`Firma: ${input.companyName} (IČO ${input.companyId ?? "—"}, DIČ ${input.vatId ?? "—"})`);
+  }
+  if (input.rentalInterest.length > 0) {
+    lines.push(`Půjčovna: ${[...new Set(input.rentalInterest)].join(", ")}`);
+  }
+
+  lines.push("", `Kontakt: ${input.name} · ${input.email}${input.phone ? ` · ${input.phone}` : ""}`);
+  if (input.message) lines.push("", input.message);
+  lines.push("", `ID poptávky: ${input.id}`);
+
+  return lines.join("\n");
+}
+
 /** Jednoduchý in-memory limit. V produkci nahraďte Redisem / Upstash. */
 const hits = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 5;
+
+/**
+ * Kolik poptávek z jedné adresy za okno. Pět stačí člověku i s překlepy,
+ * ale e2e sada odešle víc — proto se dá zvednout z prostředí. Výchozí
+ * hodnota platí všude, kde se proměnná nenastaví, tedy i na produkci.
+ */
+function maxPerWindow(): number {
+  const configured = Number(process.env.INQUIRY_RATE_LIMIT_MAX);
+  return Number.isFinite(configured) && configured > 0 ? configured : 5;
+}
 
 function rateLimited(key: string): boolean {
   const now = Date.now();
@@ -44,7 +92,7 @@ function rateLimited(key: string): boolean {
     return false;
   }
   entry.count += 1;
-  return entry.count > MAX_PER_WINDOW;
+  return entry.count > maxPerWindow();
 }
 
 export async function POST(request: Request) {
@@ -115,6 +163,21 @@ export async function POST(request: Request) {
     select: { id: true },
   });
 
-  // TODO: odeslat potvrzovací e-mail hostovi i concierge (Resend / SendGrid).
+  // Web slibuje firemní nabídku do groupPricing.quoteWithinHours hodin —
+  // a ten slib drží jen tehdy, když se o poptávce někdo doví hned.
+  // Poptávka je v tuhle chvíli uložená; odeslání ji proto nesmí shodit,
+  // sendMail() z principu nevyhazuje a při chybě jen loguje.
+  await sendMail({
+    to: process.env.INQUIRY_NOTIFY_TO ?? site.email,
+    subject: inquiryNotificationSubject(data.segment, data.name),
+    text: inquiryNotificationBody({
+      ...data,
+      id: inquiry.id,
+      nights: nightsBetween(arrival, departure),
+    }),
+    replyTo: data.email,
+  });
+
+  // TODO: potvrzovací e-mail hostovi (jinou šablonou než tenhle interní).
   return NextResponse.json({ ok: true, id: inquiry.id }, { status: 201 });
 }

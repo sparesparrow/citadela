@@ -23,6 +23,7 @@ npm run dev          # http://localhost:3000  (/ redirects to /cs or /en)
 npm run typecheck    # tsc --noEmit
 npm test             # vitest run
 npm run build        # prisma generate && next build
+npm run e2e          # cypress run (needs a running server + demo seed)
 ```
 
 Database (**Postgres, in dev too** — a server must be running):
@@ -116,6 +117,12 @@ same rules; the mode changes the deposit, never the rate.
 
 ### Booking.com integration
 
+The property is **17085726** (`BOOKING_HOTEL_ID`). Booking knows the same villa under a
+text slug and under that number; the slug can be renamed in the extranet, the ID cannot,
+so `bookingUrl()` builds `searchresults.html?dest_id=…&dest_type=hotel` and only uses
+`/hotel/<path>.html` when `BOOKING_HOTEL_PATH` is set. The ID also feeds the JSON-LD
+`sameAs`, so search engines tie the site to the Booking listing and its reviews.
+
 Booking.com has no usable public API, so `src/lib/booking.ts` does three things:
 affiliate deep-links, **inbound** iCal (`BOOKING_ICAL_URLS` → `BlockedDate`, Booking is
 source of truth and the sync replaces the whole snapshot), and **outbound** iCal
@@ -186,6 +193,11 @@ Stored in **halíře** (`amountCents`, `baseFeeCents`, `perMinuteCents`) — nev
 `formatPrice()` in `src/lib/i18n.ts`.
 
 ## Testing
+
+Four layers: `typecheck` → Vitest (pure logic) → Cypress (`npm run e2e`, pages and the
+enquiry path against a running server) → the reader simulator (signed NFC endpoints).
+Cypress specs live in `cypress/e2e/` with their own `tsconfig.json`; the root `typecheck`
+excludes them because they carry Cypress globals.
 
 Vitest, Node environment, `src/**/*.test.ts` only — the config deliberately covers pure
 logic (`src/lib`), not routes. Routes are exercised against a running dev server with

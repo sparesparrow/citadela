@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getDictionary, isLocale, formatPrice, type Locale } from "@/lib/i18n";
@@ -95,6 +96,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     geo: { "@type": "GeoCoordinates", latitude: site.geo.lat, longitude: site.geo.lng },
     email: site.email,
     telephone: site.phone,
+    // Profil objektu na Booking.com — vyhledávače tak spojí web s tamní
+    // stránkou a s jejími recenzemi místo aby je braly jako dva objekty.
+    sameAs: [bookingUrl()],
     checkinTime: site.checkIn,
     checkoutTime: site.checkOut,
     numberOfBedrooms: site.bedroomCount,
@@ -523,7 +527,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </article>
             ))}
           </div>
-          <p className="fine-note">{dict.rentals.note}</p>
+          <p className="fine-note">
+            {dict.rentals.note}{" "}
+            <Link href={`/${locale}/rental-terms`}>{dict.rentalTerms.title}</Link>
+          </p>
         </section>
 
         {/* ---------------- CENÍK ---------------- */}
@@ -766,6 +773,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <span>
             {dict.footer.checkOut} {site.checkOut}
           </span>
+        </p>
+        <p className="footer-meta">
+          <Link href={`/${locale}/rental-terms`}>{dict.rentalTerms.title}</Link>
         </p>
         <p className="footer-signoff">{dict.footer.signoff}</p>
         <p className="footer-legal">

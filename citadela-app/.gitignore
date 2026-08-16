@@ -9,3 +9,9 @@ out
 next-env.d.ts
 src/generated
 scripts/.devices.json
+
+# Cypress
+/cypress/screenshots
+/cypress/videos
+/cypress/downloads
+cypress/tsconfig.tsbuildinfo

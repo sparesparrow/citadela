@@ -42,9 +42,82 @@ async function main() {
 
   if (process.env.SEED_DEMO_ACCESS === "1") {
     await seedAccessDemo();
+    await seedDemoInquiries();
   } else {
     console.log("Přeskočeno demo přístupů. Zapněte SEED_DEMO_ACCESS=1.");
   }
+}
+
+/**
+ * Ukázkové poptávky pro správu a e2e testy: firemní s fakturací, školní
+ * v režimu s dozorem a soukromá bez segmentu. Termíny se počítají ode dneška,
+ * aby seed nezastaral, a leží za blokovanými dny, takže se nebijí s testem
+ * obsazenosti.
+ */
+async function seedDemoInquiries() {
+  const day = (offset: number) => {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() + offset);
+    return d;
+  };
+
+  const demo = [
+    {
+      name: "Jana Nováková",
+      email: "jana.novakova@demo-firma.cz",
+      phone: "+420 777 000 111",
+      arrival: day(30),
+      departure: day(34),
+      guests: 28,
+      segment: "corporate",
+      companyName: "Demo Firma s.r.o.",
+      companyId: "12345678",
+      vatId: "CZ12345678",
+      rentalInterest: ["boat", "paddleboard", "scooter"],
+      supervisorCount: null,
+      message: "Teambuilding pro obchodní tým, potřebujeme fakturu na firmu.",
+    },
+    {
+      name: "ZŠ Rozdrojovice",
+      email: "reditelna@demo-skola.cz",
+      phone: "+420 777 000 222",
+      arrival: day(60),
+      departure: day(65),
+      guests: 34,
+      segment: "school",
+      companyName: "Základní škola Rozdrojovice",
+      companyId: "87654321",
+      vatId: null,
+      rentalInterest: ["paddleboard", "bike"],
+      supervisorCount: 4,
+      message: "Sportovní kurz osmých tříd.",
+    },
+    {
+      name: "Petr Novák",
+      email: "petr.novak@demo.cz",
+      phone: null,
+      arrival: day(90),
+      departure: day(97),
+      guests: 18,
+      segment: "other",
+      companyName: null,
+      companyId: null,
+      vatId: null,
+      rentalInterest: [] as string[],
+      supervisorCount: null,
+      message: null,
+    },
+  ];
+
+  // Seed se pouští opakovaně, takže demo poptávky nejdřív zmizí. Poznáme je
+  // podle domény — skutečné poptávky z formuláře tím nejsou ohrožené.
+  await prisma.inquiry.deleteMany({ where: { email: { contains: "demo" } } });
+  await prisma.inquiry.createMany({
+    data: demo.map((inquiry) => ({ ...inquiry, roomSlug: UNIT, locale: "cs" })),
+  });
+
+  console.log(`Demo poptávky: ${demo.length}`);
 }
 
 /**

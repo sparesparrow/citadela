@@ -5,6 +5,17 @@ export const UNIT = "villa";
 export type UnitSlug = string;
 
 const BOOKING_BASE = "https://www.booking.com/hotel";
+const BOOKING_SEARCH = "https://www.booking.com/searchresults.html";
+
+/**
+ * Číselné ID objektu na Booking.com. Booking zná tentýž objekt pod dvěma
+ * adresami: textovým slugem (/hotel/cz/<slug>.html) a tímhle ID. Slug se dá
+ * v extranetu přejmenovat, ID ne — proto odkazy stavíme na ID a slug je jen
+ * volitelný override přes BOOKING_HOTEL_PATH.
+ */
+export function bookingHotelId(): string {
+  return process.env.BOOKING_HOTEL_ID ?? "17085726";
+}
 
 export interface DeepLinkOptions {
   checkin?: Date | string | null;
@@ -27,8 +38,16 @@ function toIsoDate(value: Date | string | null | undefined): string | null {
  * za rezervaci přiřadila správně — stejný princip používá i worhot.com.
  */
 export function bookingUrl(opts: DeepLinkOptions = {}): string {
-  const path = process.env.BOOKING_HOTEL_PATH ?? "cz/citadela";
-  const url = new URL(`${BOOKING_BASE}/${path}.html`);
+  const path = process.env.BOOKING_HOTEL_PATH;
+  // Bez slugu míříme na vyhledávání zúžené na jediný objekt — dest_type=hotel
+  // Booking přesměruje rovnou na stránku objektu, a to i po přejmenování slugu.
+  const url = path
+    ? new URL(`${BOOKING_BASE}/${path}.html`)
+    : new URL(BOOKING_SEARCH);
+  if (!path) {
+    url.searchParams.set("dest_id", bookingHotelId());
+    url.searchParams.set("dest_type", "hotel");
+  }
 
   const aid = process.env.BOOKING_AID;
   if (aid) url.searchParams.set("aid", aid);
@@ -46,7 +65,11 @@ export function bookingUrl(opts: DeepLinkOptions = {}): string {
   return url.toString();
 }
 
-/** Odkaz na veřejné recenze objektu. */
+/**
+ * Odkaz na veřejné recenze objektu. `tab=reviews` otevře záložku recenzí
+ * na stránce objektu; u odkazu přes ID na ni Booking návštěvníka pustí
+ * až po přesměrování, takže parametr necháváme na obou tvarech.
+ */
 export function bookingReviewsUrl(): string {
   const url = new URL(bookingUrl());
   url.searchParams.set("tab", "reviews");

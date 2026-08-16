@@ -349,6 +349,48 @@ export const rentalBySlug: Record<RentalKey, RentalItem> = Object.fromEntries(
 ) as Record<RentalKey, RentalItem>;
 
 /**
+ * Podmínky půjčovny. Loď, motorky a auta nesou povinnosti, které pronájem
+ * domu nemá — průkaz, věk, pojištění, odpovědnost za škodu. Čísla žijí tady,
+ * text ve slovníku, aby se sazebník a podmínky nemohly rozejít.
+ */
+export interface RentalTerms {
+  /** Verze podmínek; zapisuje se ke každé zápůjčce (RentalSession.termsVersion). */
+  version: string;
+  handoverFrom: string;
+  returnBy: string;
+  /** Pokuta za každou započatou hodinu zpoždění. */
+  lateFeePerHour: number;
+  /** Palivo se vrací ve stavu, v jakém se přebíralo. */
+  fuelPolicy: "fullToFull";
+  helmetRequired: boolean;
+  /** Nulová tolerance alkoholu — promile. */
+  alcoholLimit: number;
+  /**
+   * Spoluúčast při poškození. `null` znamená, že pojištění zatím není
+   * sjednané a podmínky se nesmějí zveřejnit — viz rentalTermsArePublishable.
+   */
+  insuranceExcess: number | null;
+}
+
+export const rentalTerms: RentalTerms = {
+  version: "2026-08-16",
+  handoverFrom: "09:00",
+  returnBy: "19:00",
+  lateFeePerHour: 300,
+  fuelPolicy: "fullToFull",
+  helmetRequired: true,
+  alcoholLimit: 0,
+  insuranceExcess: null,
+};
+
+/**
+ * Přepněte na true, až bude sjednané pojištění (insuranceExcess) a podmínky
+ * projdou právní kontrolou. Do té doby se stránka podmínek vykresluje
+ * s viditelnou hlavičkou „pracovní verze" — stejný princip jako u recenzí.
+ */
+export const rentalTermsArePublishable = false;
+
+/**
  * Programové balíčky — půjčovna poskládaná do půldne nebo dne, s cenou
  * za osobu. Firmy nekupují kusy techniky, kupují hotový program, který
  * si nemusí nikdo z nich organizovat.

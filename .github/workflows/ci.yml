@@ -23,7 +23,6 @@ env:
   AUTH_SECRET: ci-only-not-a-real-secret-000000000000000=
   AUTH_URL: http://localhost:3000
   AUTH_TRUST_HOST: "true"
-  BOOKING_HOTEL_PATH: cz/citadela
 
 jobs:
   verify:
@@ -152,3 +151,80 @@ jobs:
 
           npx tsx scripts/ci-reader-check.ts
           npx tsx scripts/check-double-booking.mts
+
+  e2e:
+    name: E2E (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Stejny duvod jako u ctecek: nema smysl stavet server, kdyz neprojde typecheck.
+    needs: verify
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: citadela
+          POSTGRES_PASSWORD: citadela
+          POSTGRES_DB: citadela_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U citadela"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ADMIN_EMAIL: ci@citadela.test
+      ADMIN_PASSWORD: ci-password-not-real
+      SEED_DEMO_ACCESS: "1"
+      # E2E sada odesle vic nez pet poptavek; limit patri produkci, ne testu.
+      INQUIRY_RATE_LIMIT_MAX: "500"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.11"
+          cache: npm
+          cache-dependency-path: citadela-app/package-lock.json
+
+      # Binarka Cypressu ma pres 200 MB — bez cache by se tahala pri kazdem behu.
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('citadela-app/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare database
+        run: |
+          npx prisma generate
+          npx prisma db push
+          npm run db:seed
+
+      - name: Build
+        run: npm run build
+
+      - name: Cypress
+        run: |
+          npm start &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:3000/cs; then
+              echo "Server nabehl po ${i}s."
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "Server nenabehl vcas."
+              exit 1
+            fi
+            sleep 1
+          done
+
+          npx cypress run
