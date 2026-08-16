@@ -15,6 +15,8 @@ import {
   stayLengthTiers,
   groupPricing,
   rentalBySlug,
+  houseModeRules,
+  type HouseMode,
   type RentalKey,
 } from "./site";
 
@@ -89,6 +91,8 @@ export interface QuoteInput {
   adults?: number;
   /** Pobyt celý v pracovním týdnu. */
   midweek?: boolean;
+  /** Režim domu; skupiny s dozorem mají vyšší kauci. */
+  mode?: HouseMode;
   rentals?: RentalSelection[];
 }
 
@@ -118,7 +122,7 @@ export interface Quote {
  * za kterou dům vůbec dává smysl otevřít.
  */
 export function quoteStay(input: QuoteInput): Quote {
-  const { nights, guests, midweek = false, rentals = [] } = input;
+  const { nights, guests, midweek = false, mode = "adults", rentals = [] } = input;
   if (!Number.isFinite(nights) || nights < 1) throw new RangeError("Pobyt musí mít aspoň jednu noc.");
   if (!Number.isFinite(guests) || guests < 1) throw new RangeError("Pobyt musí mít aspoň jednoho hosta.");
 
@@ -150,7 +154,7 @@ export function quoteStay(input: QuoteInput): Quote {
     touristTax,
     stayTotal,
     total: stayTotal + rentalSum.price + touristTax,
-    deposit: pricing.deposit + rentalSum.deposit,
+    deposit: houseModeRules[mode].deposit + rentalSum.deposit,
   };
 }
 

@@ -37,6 +37,10 @@ interface Props {
   rentalOptions: FormOption[];
   /** Segment, u kterého předpokládáme fakturaci na firmu. */
   invoiceSegment: string;
+  /** Segmenty, které dům provozují v režimu s dozorem. */
+  supervisedOccasions: string[];
+  /** Pravidla toho režimu, už vyhodnocená serverem. */
+  supervisedRules: string[];
   signedInEmail?: string | null;
   signedInName?: string | null;
 }
@@ -54,6 +58,8 @@ export function ReserveForm({
   occasions,
   rentalOptions,
   invoiceSegment,
+  supervisedOccasions,
+  supervisedRules,
   signedInEmail,
   signedInName,
 }: Props) {
@@ -67,6 +73,9 @@ export function ReserveForm({
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<Status>(null);
   const [dateError, setDateError] = useState<string | null>(null);
+
+  // Režim s dozorem se neptáme, ten plyne ze segmentu; server si ho odvodí znovu.
+  const supervised = supervisedOccasions.includes(occasion);
 
   const minDeparture = useMemo(() => {
     if (!arrival) return today();
@@ -108,6 +117,7 @@ export function ReserveForm({
           companyId: invoice ? data.get("companyId") || null : null,
           vatId: invoice ? data.get("vatId") || null : null,
           rentalInterest: data.getAll("rentalInterest").map(String),
+          supervisorCount: supervised ? Number(data.get("supervisorCount") ?? 0) : null,
           message: data.get("message") || null,
           website: data.get("website") || undefined,
           locale,
@@ -284,6 +294,30 @@ export function ReserveForm({
                 </label>
                 <input id="vatId" name="vatId" type="text" maxLength={20} />
               </div>
+            </div>
+          </fieldset>
+        )}
+
+        {supervised && (
+          <fieldset className="subfields">
+            <legend>{f.supervisedLegend}</legend>
+            <p className="reserve-note">{f.supervisedHint}</p>
+            <ul className="terms">
+              {supervisedRules.map((rule) => (
+                <li key={rule}>{rule}</li>
+              ))}
+            </ul>
+            <div className="field" style={{ marginTop: 22 }}>
+              <label htmlFor="supervisorCount">{f.supervisorCount}</label>
+              <input
+                id="supervisorCount"
+                name="supervisorCount"
+                type="number"
+                required
+                min={1}
+                max={maxGuests}
+                inputMode="numeric"
+              />
             </div>
           </fieldset>
         )}

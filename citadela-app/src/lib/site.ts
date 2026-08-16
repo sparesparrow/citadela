@@ -104,7 +104,7 @@ export const amenityKeys = [
   "linens",
   "nonSmoking",
   "lakeView",
-  "adultsOriented",
+  "singleParty",
 ] as const;
 
 export type AmenityKey = (typeof amenityKeys)[number];
@@ -260,6 +260,53 @@ export const supervisedSegments: SegmentKey[] = ["school", "camp"];
 /** Poptávky nesou segment jako slug, takže se hodí ověřit, že ho ještě známe. */
 export function isSegmentKey(value: string): value is SegmentKey {
   return (segments as readonly string[]).includes(value);
+}
+
+// ---------------------------------------------------------------------------
+// Režimy domu
+// ---------------------------------------------------------------------------
+
+/**
+ * Dům nezakazuje nezletilé hosty — jen se pro ně provozuje jinak. Místo věty
+ * v textu je to pravidlo, se kterým umí pracovat formulář i správa: co se
+ * zamyká, co jede na rozvrh a jaká je kauce.
+ */
+export const houseModes = ["adults", "supervised"] as const;
+export type HouseMode = (typeof houseModes)[number];
+
+export interface HouseModeRules {
+  slug: HouseMode;
+  /** Vybavení uzamčené po celou dobu pobytu. */
+  lockedAmenities: AmenityKey[];
+  /** Wellness jede podle dohodnutého rozvrhu, ne volně. */
+  timetabledWellness: boolean;
+  /** Poptávka se neobejde bez jmenovaného dozoru. */
+  requiresSupervisors: boolean;
+  /** Vratná kauce pro tento režim. */
+  deposit: number;
+}
+
+export const houseModeRules: Record<HouseMode, HouseModeRules> = {
+  adults: {
+    slug: "adults",
+    lockedAmenities: [],
+    timetabledWellness: false,
+    requiresSupervisors: false,
+    deposit: pricing.deposit,
+  },
+  supervised: {
+    slug: "supervised",
+    lockedAmenities: ["poleDance"],
+    timetabledWellness: true,
+    requiresSupervisors: true,
+    // Vyšší kauce, protože bazén a sauna jedou na rozvrh a někdo je musí hlídat.
+    deposit: 30_000,
+  },
+};
+
+/** V jakém režimu dům pro daný segment běží. */
+export function houseModeFor(segment: SegmentKey | "other"): HouseMode {
+  return isSegmentKey(segment) && supervisedSegments.includes(segment) ? "supervised" : "adults";
 }
 
 // ---------------------------------------------------------------------------

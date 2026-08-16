@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { site, segments, rentals } from "@/lib/site";
+import { site, segments, rentals, houseModeFor } from "@/lib/site";
 import { isAvailable } from "@/lib/availability";
 import { UNIT } from "@/lib/booking";
 
@@ -24,6 +24,7 @@ const schema = z.object({
   vatId: z.string().trim().max(20).nullish(),
   // Zájem o půjčovnu; duplicity odstraníme, ať se nezapisují dvakrát.
   rentalInterest: z.array(z.enum(rentals)).max(rentals.length * 2).default([]),
+  supervisorCount: z.coerce.number().int().min(0).max(60).nullish(),
   message: z.string().trim().max(2000).nullish(),
   locale: z.enum(["cs", "en"]).default("cs"),
   // Honeypot — roboti vyplní i skryté pole, lidé ne.
@@ -103,6 +104,10 @@ export async function POST(request: Request) {
       companyId: data.companyId || null,
       vatId: data.vatId || null,
       rentalInterest: [...new Set(data.rentalInterest)],
+      // Dozor dává smysl jen v režimu s dozorem; režim si odvodíme ze segmentu
+      // znovu na serveru, ať se do sloupce nedostane číslo od firemního pobytu.
+      supervisorCount:
+        houseModeFor(data.segment) === "supervised" ? (data.supervisorCount ?? null) : null,
       message: data.message ?? null,
       locale: data.locale,
       userId: session?.user?.id ?? null,

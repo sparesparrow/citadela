@@ -1104,6 +1104,14 @@ dialog::backdrop { background: rgba(6, 6, 6, 0.86); backdrop-filter: blur(6px); 
 /* karta segmentu roste, seznam techniky drží u spodní hrany */
 .segment .segment-rentals { margin-top: auto; padding-top: 12px; }
 
+.segment-mode { color: var(--warn); }
+
+/* režimy domu */
+.modes { margin-top: 52px; }
+.modes .lead { margin-top: 10px; }
+.modes .terms { margin-top: 16px; }
+.modes .terms li { font-size: 13.5px; padding: 9px 0 9px 20px; }
+
 /* flotila půjčovny */
 .fleet-table { border: 1px solid var(--line-strong); margin-top: 26px; }
 .fleet-name { display: flex; align-items: center; gap: 10px; color: var(--cream); }

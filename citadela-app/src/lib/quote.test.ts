@@ -8,7 +8,7 @@ import {
   rentalTotal,
   stayLengthDiscount,
 } from "./quote";
-import { groupPricing, pricing, rates, rentalBySlug } from "./site";
+import { groupPricing, houseModeRules, pricing, rates, rentalBySlug } from "./site";
 
 /**
  * Testy orientacni kalkulace.
@@ -166,6 +166,20 @@ describe("quoteStay", () => {
   it("kauce za techniku se pricita ke kauci za dum", () => {
     const quote = quoteStay({ nights: 2, guests: 10, rentals: [{ slug: "boat", count: 1, days: 1 }] });
     expect(quote.deposit).toBe(pricing.deposit + (rentalBySlug.boat.deposit ?? 0));
+  });
+
+  it("provoz s dozorem ma vlastni, vyssi kauci", () => {
+    const adults = quoteStay({ nights: 3, guests: 30 });
+    const supervised = quoteStay({ nights: 3, guests: 30, mode: "supervised" });
+    expect(adults.deposit).toBe(houseModeRules.adults.deposit);
+    expect(supervised.deposit).toBe(houseModeRules.supervised.deposit);
+    expect(supervised.deposit).toBeGreaterThan(adults.deposit);
+  });
+
+  it("rezim nemeni cenu pobytu, jen kauci", () => {
+    const adults = quoteStay({ nights: 3, guests: 30 });
+    const supervised = quoteStay({ nights: 3, guests: 30, mode: "supervised" });
+    expect(supervised.total).toBe(adults.total);
   });
 
   it("odmitne pobyt bez noci nebo bez hostu", () => {

@@ -98,6 +98,10 @@ model Inquiry {
   /// O jakou techniku z pujcovny ma zajem (RentalKey ze src/lib/site.ts).
   rentalInterest String[]
 
+  /// Pocet osob dozoru u skupin s nezletilymi. Rezim domu se z nej neodvozuje —
+  /// ten plyne ze segmentu pres houseModeFor(); tohle je udaj pro provoz.
+  supervisorCount Int?
+
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 

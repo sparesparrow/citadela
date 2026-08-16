@@ -98,9 +98,21 @@ and unit-tested (`quote.test.ts`); keep new pricing rules there rather than in c
 Amounts here are whole **CZK**, matching `rates`/`pricing` — halíře belong to the access folio.
 
 An `Inquiry` carries `segment` (a `SegmentKey` slug, or `other`), the billing fields
-`companyName`/`companyId`/`vatId`, and `rentalInterest` (`RentalKey[]`). Slugs, not enums —
-the code list lives in `site.ts`, and `isSegmentKey()` guards reads of older rows whose
-segment no longer exists.
+`companyName`/`companyId`/`vatId`, `rentalInterest` (`RentalKey[]`) and `supervisorCount`.
+Slugs, not enums — the code list lives in `site.ts`, and `isSegmentKey()` guards reads of
+older rows whose segment no longer exists.
+
+### House modes
+
+The villa is **not** adults-only; it is let to one party at a time (`singleParty` amenity)
+and *run* differently depending on who books it. `houseModes` + `houseModeRules` in `site.ts`
+say what that means: `supervised` (school trips, camps) locks `poleDance`, puts the wellness
+floor on a timetable, requires named supervisors and carries a higher deposit.
+
+**The mode is derived, never submitted** — `houseModeFor(segment)` is the only source, and
+`/api/inquiries` re-derives it server-side, so `supervisorCount` sent with a corporate
+enquiry is discarded rather than stored. `quoteStay({ mode })` picks the deposit from the
+same rules; the mode changes the deposit, never the rate.
 
 ### Booking.com integration
 

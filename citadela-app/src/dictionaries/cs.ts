@@ -66,9 +66,9 @@ export const cs: Dictionary = {
     heading: "Překročte práh všedního dne.",
     body: "Silnice se zúží, stromy se sevřou, brána se otevře sama — a pak dům. Osm ložnic ve dvou patrech, čtyři společenské prostory a wellness ve spodní části. Společenská místnost s kulečníkem, taneční parket, ozvučení vyvedené až na terasu a gauče tak hluboké, že se z nich několik hodin nikdo nezvedne.",
     body2:
-      "Je to dům postavený pro společnost, která chce být sama. Rodiny si ho berou kvůli bazénu a klidnému břehu, uzavřené společnosti kvůli prostoru a diskrétnosti. Hosté jsou dospělí, areál je oplocený a co se děje vevnitř, zůstává mezi těmi, kdo tam jsou.",
+      "Je to dům postavený pro společnost, která chce být sama. Rodiny si ho berou kvůli bazénu a klidnému břehu, firmy a uzavřené společnosti kvůli prostoru a diskrétnosti. Areál je oplocený, za pobyt odpovídá jedna společnost a co se děje vevnitř, zůstává mezi těmi, kdo tam jsou.",
     adultNote:
-      "Citadela Resort je zařízená pro dospělé hosty a pronajímá se vždy jen jedné společnosti. Zvířata nejsou povolena.",
+      "Citadela Resort se pronajímá vždy jen jedné společnosti — rodinám, firmám, svatbám i školním skupinám. Wellness, bar i taneční parket jsou po dobu pobytu ve správě toho, kdo si dům vzal. Zvířata nejsou povolena.",
   },
   bedrooms: {
     eyebrow: "Ložnice",
@@ -167,7 +167,7 @@ export const cs: Dictionary = {
       linens: "Povlečení, osušky a prostěradla do sauny",
       nonSmoking: "V domě se nekouří",
       lakeView: "Výhled na přehradu",
-      adultsOriented: "Zařízeno pro dospělé hosty",
+      singleParty: "Vždy jen jedna společnost v celém objektu",
     },
   },
   groups: {
@@ -200,9 +200,27 @@ export const cs: Dictionary = {
         body: "Týden a víc s vodou za humny: lodě a paddleboardy z vlastní flotily, lesní cesty rovnou od brány a večery, které zůstanou v areálu. Nejdelší pobyty mají největší slevu.",
       },
     },
-    supervisedNote:
-      "Dům je zařízený pro dospělé hosty. Školní skupiny a tábory bereme po předchozí dohodě, se jmenovaným dozorem a s wellness provozovaným podle dohodnutého rozvrhu.",
     cta: "Poptat skupinovou nabídku",
+    modes: {
+      heading: "Dům běží dvěma způsoby",
+      lead: "Dům se podle toho, kdo si ho vezme, nemění — mění se jeho provoz. Skupiny s nezletilými bereme v režimu s dozorem, domluveném před příjezdem.",
+      items: {
+        adults: {
+          name: "Běžný provoz",
+          body: "Všechno otevřené a nic na rozvrh: wellness, bar i taneční parket jsou po celou dobu pobytu vaše.",
+        },
+        supervised: {
+          name: "Provoz s dozorem",
+          body: "Pro školní výlety, tábory a soustředění. Domlouvá se s organizátorem předem a píše se do smlouvy.",
+        },
+      },
+      rules: {
+        supervisors: "Jmenovaný dozor přítomný po celou dobu pobytu",
+        timetable: "Bazén a sauna podle dohodnutého rozvrhu, ne volně",
+        locked: (items: string) => `Po dobu pobytu uzamčeno: ${items}`,
+        deposit: (amount: string) => `Vratná kauce ${amount}`,
+      },
+    },
   },
   corporate: {
     eyebrow: "Pro firmy",
@@ -329,7 +347,7 @@ export const cs: Dictionary = {
       advance: (percent: number) => `Rezervace je závazná po zaplacení zálohy ${percent} % z ceny.`,
       checkInOut: (inTime: string, outTime: string) => `Příjezd od ${inTime}, odjezd nejpozději do ${outTime}.`,
       season: "V hlavní sezóně jsou k dispozici pouze celé týdny, od neděle do neděle.",
-      capacity: (n: number) => `Uveďte prosím přesný počet osob; kapacita je ${n} dospělých.`,
+      capacity: (n: number) => `Uveďte prosím přesný počet osob; k dispozici je ${n} lůžek.`,
       pets: "Zvířata nejsou povolena.",
       parking: "Parkování je v ceně.",
       energy: "Energie se doplácí po skončení pobytu, odběr vidíte průběžně. Vodné a stočné je v ceně.",
@@ -406,6 +424,9 @@ export const cs: Dictionary = {
       optional: "nepovinné",
       rentalsLegend: "Co byste si chtěli půjčit",
       rentalsHint: "Jen abychom to podrželi — nic se neúčtuje, dokud se nedomluvíme.",
+      supervisedLegend: "Pobyt s dozorem",
+      supervisedHint: "Vaše skupina veze nezletilé, takže dům poběží v režimu s dozorem. Na ceně to nic nemění, jen na tom, jak se pobyt domluví.",
+      supervisorCount: "Počet osob dozoru",
       message: "Příležitost a cokoli, co bychom měli vědět",
       messageOptional: "nepovinné",
       submit: "Odeslat poptávku",
@@ -475,6 +496,9 @@ export const cs: Dictionary = {
       companyId: "IČO",
       vatId: "DIČ",
       wantsRentals: "Půjčovna",
+      supervisedMode: "Provoz s dozorem",
+      supervisors: (n: number) => (n === 1 ? "1 osoba dozoru" : n < 5 ? `${n} osoby dozoru` : `${n} osob dozoru`),
+      supervisorsMissing: "dozor neuveden",
       nights: (n: number) => (n === 1 ? "1 noc" : n < 5 ? `${n} noci` : `${n} nocí`),
       statuses: { NEW: "Nová", CONTACTED: "Kontaktováno", CONFIRMED: "Potvrzeno", DECLINED: "Zamítnuto" },
     },

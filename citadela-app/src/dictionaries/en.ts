@@ -68,9 +68,9 @@ export const en = {
     heading: "Cross the threshold of the everyday.",
     body: "The road narrows, the trees close in, the gate opens on its own — and then the house. Eight bedrooms across two floors, four social spaces, and a wellness floor below. A lounge with a billiard table, a dance floor, a sound system wired through to the terrace, and sofas deep enough that nobody moves for hours.",
     body2:
-      "It is a house built for a group that wants to be left alone. Families take it for the pool and the private shore; closed companies take it for the space and the discretion. Guests are adults, the grounds are fenced, and what happens inside stays between the people who are there.",
+      "It is a house built for a group that wants to be left alone. Families take it for the pool and the private shore; companies and closed parties take it for the space and the discretion. The grounds are fenced, one party answers for the stay, and what happens inside stays between the people who are there.",
     adultNote:
-      "Citadela Resort is arranged for adult guests and rented to a single party at a time. Pets are not permitted.",
+      "Citadela Resort is let to one party at a time — families, companies, weddings and school groups alike. The wellness floor, the bar and the dance floor are in the hands of whoever books the house. Pets are not permitted.",
   },
   bedrooms: {
     eyebrow: "The Bedrooms",
@@ -169,7 +169,7 @@ export const en = {
       linens: "Bed linen, towels & sauna sheets",
       nonSmoking: "Non-smoking indoors",
       lakeView: "Reservoir view",
-      adultsOriented: "Arranged for adult guests",
+      singleParty: "One party in the house, always",
     },
   },
   groups: {
@@ -201,9 +201,27 @@ export const en = {
         body: "A week or more with the water on the doorstep: boats and boards from our own fleet, forest paths straight from the gate, and evenings that stay inside the grounds. The longest stays carry the largest reduction.",
       },
     },
-    supervisedNote:
-      "The house is furnished for adult guests. School groups and camps are welcome by prior arrangement, with named supervisors and the wellness floor used to an agreed timetable.",
     cta: "Ask for a group offer",
+    modes: {
+      heading: "Two ways the house runs",
+      lead: "Nothing about the house changes with who books it — how it is run does. Groups bringing minors are taken in supervised mode, agreed before arrival.",
+      items: {
+        adults: {
+          name: "Standard",
+          body: "Everything open, nothing on a timetable: the wellness floor, the bar and the dance floor are yours for the length of the stay.",
+        },
+        supervised: {
+          name: "Supervised",
+          body: "For school trips, camps and training weeks. Agreed with the organiser in advance and written into the booking.",
+        },
+      },
+      rules: {
+        supervisors: "Named supervisors present for the whole stay",
+        timetable: "Pool and sauna run to an agreed timetable, not open access",
+        locked: (items: string) => `Locked for the stay: ${items}`,
+        deposit: (amount: string) => `Refundable deposit of ${amount}`,
+      },
+    },
   },
   corporate: {
     eyebrow: "For companies",
@@ -324,7 +342,7 @@ export const en = {
       advance: (percent: number) => `A booking becomes binding once a ${percent}% deposit is paid.`,
       checkInOut: (inTime: string, outTime: string) => `Arrival from ${inTime}, departure by ${outTime}.`,
       season: "In high season only full weeks are available, Sunday to Sunday.",
-      capacity: (n: number) => `Please state the exact number of guests; capacity is ${n} adults.`,
+      capacity: (n: number) => `Please state the exact number of guests; there are ${n} beds.`,
       pets: "Pets are not permitted.",
       parking: "Parking is included.",
       energy: "Energy is billed after the stay; consumption is visible throughout. Water is included.",
@@ -401,6 +419,9 @@ export const en = {
       optional: "optional",
       rentalsLegend: "Rentals you would want",
       rentalsHint: "Only so we can hold them — nothing is charged until it is agreed.",
+      supervisedLegend: "Supervised stay",
+      supervisedHint: "Your group brings minors, so the house runs in supervised mode. It changes nothing about the rate — only how the stay is arranged.",
+      supervisorCount: "Supervisors",
       message: "The occasion, and anything we should know",
       messageOptional: "optional",
       submit: "Send enquiry",
@@ -470,6 +491,9 @@ export const en = {
       companyId: "Reg. no.",
       vatId: "VAT no.",
       wantsRentals: "Rentals",
+      supervisedMode: "Supervised mode",
+      supervisors: (n: number) => (n === 1 ? "1 supervisor" : `${n} supervisors`),
+      supervisorsMissing: "supervisors not stated",
       nights: (n: number) => (n === 1 ? "1 night" : `${n} nights`),
       statuses: { NEW: "New", CONTACTED: "Contacted", CONFIRMED: "Confirmed", DECLINED: "Declined" },
     },

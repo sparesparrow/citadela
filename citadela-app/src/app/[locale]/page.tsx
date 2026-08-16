@@ -15,6 +15,9 @@ import {
   stayLengthTiers,
   groupPricing,
   segmentList,
+  supervisedSegments,
+  houseModes,
+  houseModeRules,
   rentals,
   rentalItems,
   rentalPackageList,
@@ -60,6 +63,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     { value: "other", label: dict.reserve.form.occasionOther },
   ];
   const rentalOptions = rentals.map((key) => ({ value: key, label: dict.rentals.items[key].name }));
+
+  // Pravidla provozu s dozorem vyhodnotíme na serveru — slovník obsahuje
+  // funkce a klientská komponenta si je předat nedá.
+  const supervisedRules = [
+    dict.groups.modes.rules.supervisors,
+    dict.groups.modes.rules.timetable,
+    dict.groups.modes.rules.locked(
+      houseModeRules.supervised.lockedAmenities.map((key) => dict.facilities.items[key]).join(", "),
+    ),
+    dict.groups.modes.rules.deposit(money(houseModeRules.supervised.deposit)),
+  ];
 
   const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${site.geo.lng - 0.02}%2C${
     site.geo.lat - 0.012
@@ -233,6 +247,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   <p className="segment-facts">
                     <span>{dict.groups.minGuests(segment.minGuests)}</span>
                     <span>{dict.groups.minNights(segment.minNights)}</span>
+                    {supervisedSegments.includes(segment.slug) && (
+                      <span className="segment-mode">{dict.groups.modes.items.supervised.name}</span>
+                    )}
                   </p>
                   <p>{text.body}</p>
                   <p className="segment-rentals-label">{dict.groups.rentalsLabel}</p>
@@ -249,7 +266,40 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             })}
           </div>
 
-          <p className="fine-note">{dict.groups.supervisedNote}</p>
+          {/* Režimy domu — pravidlo, ne věta v textu. Seznam pro provoz
+              s dozorem se skládá ze site.ts, ať se text nerozejde s tím,
+              podle čeho se pobyt doopravdy domlouvá. */}
+          <div className="modes">
+            <h3 className="terms-heading">{dict.groups.modes.heading}</h3>
+            <p className="lead">{dict.groups.modes.lead}</p>
+            <div className="mini-grid">
+              {houseModes.map((mode) => {
+                const rules = houseModeRules[mode];
+                const text = dict.groups.modes.items[mode];
+                return (
+                  <div className="mini" key={mode}>
+                    <h3>{text.name}</h3>
+                    <p>{text.body}</p>
+                    {mode === "supervised" && (
+                      <ul className="terms">
+                        {rules.requiresSupervisors && <li>{dict.groups.modes.rules.supervisors}</li>}
+                        {rules.timetabledWellness && <li>{dict.groups.modes.rules.timetable}</li>}
+                        {rules.lockedAmenities.length > 0 && (
+                          <li>
+                            {dict.groups.modes.rules.locked(
+                              rules.lockedAmenities.map((key) => dict.facilities.items[key]).join(", "),
+                            )}
+                          </li>
+                        )}
+                        <li>{dict.groups.modes.rules.deposit(money(rules.deposit))}</li>
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <a className="btn" href="#contact" style={{ marginTop: 28 }}>
             <span>{dict.groups.cta}</span>
           </a>
@@ -686,6 +736,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               occasions={occasions}
               rentalOptions={rentalOptions}
               invoiceSegment="corporate"
+              supervisedOccasions={[...supervisedSegments]}
+              supervisedRules={supervisedRules}
               signedInEmail={session?.user?.email ?? null}
               signedInName={session?.user?.name ?? null}
             />

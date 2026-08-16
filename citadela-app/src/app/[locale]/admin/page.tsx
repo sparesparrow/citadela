@@ -4,7 +4,7 @@ import { requireAdmin } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, isLocale, formatDate, type Locale } from "@/lib/i18n";
 import { icalTargets } from "@/lib/booking";
-import { isSegmentKey, type RentalKey } from "@/lib/site";
+import { houseModeFor, isSegmentKey, type RentalKey, type SegmentKey } from "@/lib/site";
 import type { Dictionary } from "@/dictionaries/en";
 import { SyncPanel } from "@/components/SyncPanel";
 import { SignOutButton } from "@/components/AuthForms";
@@ -162,6 +162,22 @@ export default async function AdminPage({ params }: { params: Promise<{ locale: 
                           </span>
                         </>
                       )}
+                      {/* Provoz s dozorem je to, co se musí domluvit ještě před
+                          potvrzením termínu — proto rovnou u poptávky. */}
+                      {isSegmentKey(inq.segment) &&
+                        houseModeFor(inq.segment as SegmentKey) === "supervised" && (
+                          <>
+                            <br />
+                            <span className="pill" data-tone="warn">
+                              {dict.admin.inquiries.supervisedMode}
+                            </span>{" "}
+                            <span className="small">
+                              {inq.supervisorCount
+                                ? dict.admin.inquiries.supervisors(inq.supervisorCount)
+                                : dict.admin.inquiries.supervisorsMissing}
+                            </span>
+                          </>
+                        )}
                       {inq.rentalInterest.length > 0 && (
                         <>
                           <br />

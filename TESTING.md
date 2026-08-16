@@ -8,7 +8,7 @@ Three layers, in order of speed:
 | Layer | Command | Covers |
 |---|---|---|
 | Static | `npm run typecheck` | types, dictionary key parity |
-| Unit | `npm test` | pure logic (`src/lib`) — 109 tests |
+| Unit | `npm test` | pure logic (`src/lib`) — 121 tests |
 | Reader | `npx tsx scripts/ci-reader-check.ts` | signed NFC endpoints — 11 assertions |
 | Browser | this document | UI, forms, auth, responsive |
 
@@ -42,8 +42,8 @@ and `scripts/.devices.json` with the private keys the simulator needs.
 cd citadela-app && npm run typecheck && npm test
 ```
 
-Expected: no `tsc` output, 109 tests passing across six files (access rules, device crypto,
-Booking.com iCal, retention, i18n formatting, group quote).
+Expected: no `tsc` output, 121 tests passing across seven files (access rules, device crypto,
+Booking.com iCal, retention, i18n formatting, group quote, offer code lists).
 
 Run a single file or a single test:
 
@@ -145,7 +145,11 @@ shows up as a blank card rather than a type error.
    Untick `invoice` → the fields disappear and their values are *not* sent.
 4. Tick two rentals, submit, then check the POST body in `read_network_requests`:
    `segment: "corporate"` and `rentalInterest` holding exactly those two slugs.
-5. Repeat on `/en` — both dictionaries must render the same structure.
+5. Pick **Školní výlety a kurzy**: the supervised fieldset appears with the house-mode rules
+   and a required `#supervisorCount`. Switch back to a corporate occasion → it disappears,
+   and the POST body carries `supervisorCount: null` (the server discards it either way —
+   the mode comes from `houseModeFor(segment)`, never from the browser).
+6. Repeat on `/en` — both dictionaries must render the same structure.
 
 ### 3.4 Reserve form — the three rejection paths
 
