@@ -9,3 +9,6 @@ out
 next-env.d.ts
 src/generated
 scripts/.devices.json
+
+.vercel
+.env*
