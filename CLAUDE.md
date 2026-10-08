@@ -10,9 +10,7 @@ These are self-contained documents, not part of any build.
 
 The actual application is **`citadela-app/`** — all commands below run from there.
 
-Note: the root `README.md` describes numbered asset folders (`01-logos/`, `02-identity/`, …)
-that do not exist; the assets are loose files in the root. The README is a brand document,
-not an accurate file map.
+The assets are loose files in the root; the root `README.md` maps them and summarises the app.
 
 ## Commands
 
