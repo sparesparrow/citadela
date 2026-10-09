@@ -46,7 +46,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U tichy24"
+          --health-cmd "pg_isready -U tichy24 -d tichy24_ci"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -56,7 +56,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20.11"
+          # Prisma 7 vyzaduje Node >= 20.19 / 22.12 (starsi `npm ci` shodi uz v preinstallu).
+          node-version: "22"
           cache: npm
           cache-dependency-path: tichy24-shop/package-lock.json
 
