@@ -22,10 +22,10 @@ defaults:
   run:
     working-directory: tichy24-shop
 
-# Nejsou to tajemstvi: databaze je jednorazovy kontejner a klic plati
-# jen po dobu behu jobu. Skutecne hodnoty patri do secrets hostingu.
+# Nejsou to tajemstvi: databaze je jednorazovy kontejner bez hesla (trust)
+# a klic plati jen po dobu behu jobu. Skutecne hodnoty patri do secrets hostingu.
 env:
-  DATABASE_URL: postgresql://tichy24:tichy24@localhost:5432/tichy24_ci
+  DATABASE_URL: postgresql://tichy24@localhost:5432/tichy24_ci
   AUTH_SECRET: ci-only-not-a-real-secret-000000000000000=
   AUTH_TRUST_HOST: "true"
   SITE_URL: http://localhost:3000
@@ -41,7 +41,7 @@ jobs:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: tichy24
-          POSTGRES_PASSWORD: tichy24
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: tichy24_ci
         ports:
           - 5432:5432

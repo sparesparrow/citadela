@@ -1,13 +1,14 @@
 # Lokalni Postgres pro vyvoj: `docker compose up -d`
+# Bez hesla (trust) a jen na loopbacku — zadne heslo se tak neukladá do repozitare.
 services:
   db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: tichy24
-      POSTGRES_PASSWORD: tichy24
       POSTGRES_DB: tichy24
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - tichy24-pg:/var/lib/postgresql/data
 volumes:
