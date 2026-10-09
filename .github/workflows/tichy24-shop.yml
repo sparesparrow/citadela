@@ -1,0 +1,84 @@
+name: tichy24-shop CI
+
+# Samostatny workflow, aby se obchod dal pozdeji vyriznout z repozitare i s CI.
+# Pousti se jen kdyz se meni obchod (nebo tento soubor) — citadela-app ma vlastni ci.yml.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tichy24-shop/**"
+      - ".github/workflows/tichy24-shop.yml"
+  pull_request:
+    paths:
+      - "tichy24-shop/**"
+      - ".github/workflows/tichy24-shop.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: tichy24-shop
+
+# Nejsou to tajemstvi: databaze je jednorazovy kontejner a klic plati
+# jen po dobu behu jobu. Skutecne hodnoty patri do secrets hostingu.
+env:
+  DATABASE_URL: postgresql://tichy24:tichy24@localhost:5432/tichy24_ci
+  AUTH_SECRET: ci-only-not-a-real-secret-000000000000000=
+  AUTH_TRUST_HOST: "true"
+  SITE_URL: http://localhost:3000
+
+jobs:
+  verify:
+    name: Typecheck, tests, build, stock race
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: tichy24
+          POSTGRES_PASSWORD: tichy24
+          POSTGRES_DB: tichy24_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tichy24"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.11"
+          cache: npm
+          cache-dependency-path: tichy24-shop/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Apply migrations
+        # `migrate deploy`, ne `db push`: CI tim overuje, ze migrace sedi na schema.
+        run: npx prisma migrate deploy
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Stock race check
+        # Dukaz nad skutecnou databazi: posledni kusy zbozi nejdou prodat dvakrat.
+        run: npm run check:stock

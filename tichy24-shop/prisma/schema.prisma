@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  // Postgres i ve vyvoji. Prisma 7: pripojovaci retezec zije v prisma.config.ts.
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------- Administrace
+
+/// Jen personal obchodu. Zakaznici ucet nemaji — objednavaji jako hoste.
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------- Katalog
+//
+// Vsechny penize jsou v nejmensi jednotce meny (CHF -> Rappen), v poli
+// `...Cents`. Nikdy float. Ceny jsou KONCOVE, tedy vcetne MwSt.
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  sortOrder Int       @default(0)
+  products  Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  sku         String   @unique
+  name        String
+  /// Jedna veta do vypisu.
+  summary     String
+  /// Cely popis; odstavce oddelene prazdnym radkem.
+  description String
+  priceCents  Int
+  /// Pocet kusu skladem. Meni se jen atomicky (viz src/lib/orders.ts).
+  stock       Int      @default(0)
+  /// Neaktivni produkt zmizi z obchodu, ale zustane v historii objednavek.
+  active      Boolean  @default(true)
+  imageUrl    String?
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([categoryId, active])
+}
+
+// ---------------------------------------------------------------- Objednavky
+
+enum OrderStatus {
+  /// Prijata, ceka na zaplaceni (predem) nebo na vyzvednuti (hotove).
+  NEW
+  PAID
+  /// Odeslano nebo predano zakaznikovi.
+  FULFILLED
+  CANCELLED
+}
+
+enum DeliveryMethod {
+  SHIPPING
+  PICKUP
+}
+
+enum PaymentMethod {
+  PREPAYMENT
+  CASH_ON_PICKUP
+}
+
+model Order {
+  id          String @id @default(cuid())
+  /// Lidsky citelne cislo (T24-00001). Generuje ho databaze, ne aplikace,
+  /// aby dve soubezne objednavky nikdy nedostaly stejne.
+  number      Int    @unique @default(autoincrement())
+  /// Nahodny token do verejneho odkazu na potvrzeni. Cislo objednavky je
+  /// uhodnutelne, stranka pritom ukazuje adresu — bez tokenu by ji cetl kazdy.
+  publicToken String @unique
+
+  status         OrderStatus    @default(NEW)
+  deliveryMethod DeliveryMethod
+  paymentMethod  PaymentMethod
+
+  email      String
+  phone      String?
+  name       String
+  // Adresa je u vyzvednuti prazdna.
+  street     String?
+  postalCode String?
+  city       String?
+  country    String?
+  note       String?
+
+  subtotalCents Int
+  shippingCents Int
+  totalCents    Int
+  /// MwSt obsazena v totalCents (informativne, pro doklad).
+  vatCents      Int
+  /// Sazba v setinach procenta: 810 = 8,1 %. Ulozena u objednavky, protoze
+  /// se v case meni a stara objednavka nesmi zmenit hodnotu zpetne.
+  vatRateBp     Int
+
+  items OrderItem[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  paidAt      DateTime?
+  fulfilledAt DateTime?
+  cancelledAt DateTime?
+
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  // Snapshot v okamziku nakupu: pozdejsi zmena ceny ci nazvu produktu
+  // nesmi prepsat, co zakaznik skutecne koupil.
+  sku       String
+  name      String
+  unitCents Int
+  quantity  Int
+
+  @@index([orderId])
+}

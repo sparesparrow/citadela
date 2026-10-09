@@ -1,0 +1,14 @@
+# Lokalni Postgres pro vyvoj: `docker compose up -d`
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tichy24
+      POSTGRES_PASSWORD: tichy24
+      POSTGRES_DB: tichy24
+    ports:
+      - "5432:5432"
+    volumes:
+      - tichy24-pg:/var/lib/postgresql/data
+volumes:
+  tichy24-pg:

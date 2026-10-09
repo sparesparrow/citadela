@@ -10,6 +10,12 @@ These are self-contained documents, not part of any build.
 
 The actual application is **`citadela-app/`** — all commands below run from there.
 
+There is a second, independent app in **`tichy24-shop/`**: a German-language (de-CH) e-shop for
+`tichy24.ch` (Dušan Tichý, "Ihr Allrounder-Mechaniker"). It lives here only temporarily and will be
+split into its own repository, so it has its own `package.json`, schema, CI workflow
+(`.github/workflows/tichy24-shop.yml`) and `README.md`, and **shares no code** with `citadela-app`.
+Don't import across the two directories; copy a pattern instead. See `tichy24-shop/README.md`.
+
 Note: the root `README.md` describes numbered asset folders (`01-logos/`, `02-identity/`, …)
 that do not exist; the assets are loose files in the root. The README is a brand document,
 not an accurate file map.
