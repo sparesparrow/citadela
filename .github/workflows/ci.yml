@@ -52,8 +52,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # Odpovídá `engines.node` v package.json.
-          node-version: "20.11"
+          # Prisma 7 se pod Node 20.19 odmita nainstalovat (preinstall skript) a
+          # @prisma/streams-local chce 22+. Vercel buildi na 22.x, CI drzi totez.
+          node-version: "22"
           cache: npm
           cache-dependency-path: citadela-app/package-lock.json
 
@@ -114,7 +115,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20.11"
+          node-version: "22"
           cache: npm
           cache-dependency-path: citadela-app/package-lock.json
 
