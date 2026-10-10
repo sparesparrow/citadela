@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getDictionary, isLocale, locales, type Locale } from "@/lib/i18n";
 import { bookingUrl } from "@/lib/booking";
-import { site } from "@/lib/site";
+import { photos, site } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { RevealFallback } from "@/components/RevealFallback";
 import "../globals.css";
@@ -68,6 +68,21 @@ export async function generateMetadata({
       title: dict.meta.title,
       description: dict.meta.description,
       siteName: site.name,
+      // Nahled pri sdileni odkazu (WhatsApp, Facebook, e-mail) — bez nej se ukaze jen text.
+      images: [
+        {
+          url: photos.exterior.src,
+          width: photos.exterior.width,
+          height: photos.exterior.height,
+          alt: dict.photos.exterior,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: dict.meta.title,
+      description: dict.meta.description,
+      images: [photos.exterior.src],
     },
     robots: { index: true, follow: true },
   };
